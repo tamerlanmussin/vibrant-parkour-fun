@@ -96,8 +96,6 @@ function Game() {
     const ctx = canvas.getContext("2d")!;
     const W = (canvas.width = 960);
     const H = (canvas.height = 540);
-    const W = (canvas.width = 960);
-    const H = (canvas.height = 540);
 
     const keys: Record<string, boolean> = {};
     const kd = (e: KeyboardEvent) => {
