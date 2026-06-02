@@ -1,5 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+type LeaderRow = { username: string; best_score: number };
+type Profile = { username: string; best_score: number };
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,6 +23,73 @@ function Game() {
   const [best, setBest] = useState(0);
   const [dead, setDead] = useState(false);
   const restartRef = useRef<() => void>(() => {});
+  const [userId, setUserId] = useState<string | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [leaders, setLeaders] = useState<LeaderRow[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const lastSubmittedRef = useRef<number>(-1);
+
+  async function loadLeaders() {
+    const { data } = await supabase
+      .from("profiles")
+      .select("username,best_score")
+      .order("best_score", { ascending: false })
+      .limit(10);
+    if (data) setLeaders(data);
+  }
+
+  async function loadProfile(uid: string) {
+    const { data } = await supabase
+      .from("profiles")
+      .select("username,best_score")
+      .eq("user_id", uid)
+      .maybeSingle();
+    if (data) {
+      setProfile(data);
+      setBest(data.best_score);
+    }
+  }
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      const uid = data.session?.user.id ?? null;
+      setUserId(uid);
+      if (uid) loadProfile(uid);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      const uid = session?.user.id ?? null;
+      setUserId(uid);
+      if (uid) loadProfile(uid);
+      else setProfile(null);
+    });
+    loadLeaders();
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  async function submitScore(finalScore: number) {
+    if (!userId || finalScore <= 0) return;
+    if (lastSubmittedRef.current === finalScore) return;
+    lastSubmittedRef.current = finalScore;
+    setSubmitting(true);
+    try {
+      await supabase.from("scores").insert({ user_id: userId, score: finalScore });
+      if (profile && finalScore > profile.best_score) {
+        await supabase
+          .from("profiles")
+          .update({ best_score: finalScore })
+          .eq("user_id", userId);
+        setProfile({ ...profile, best_score: finalScore });
+      }
+      await loadLeaders();
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  useEffect(() => {
+    if (dead && score > 0) submitScore(score);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dead, score]);
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -230,7 +301,33 @@ function Game() {
   }, []);
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center gap-4 p-4" style={{ background: "radial-gradient(circle at 50% 0%, #1a0535 0%, #05010f 70%)" }}>
+    <main className="min-h-screen flex flex-col items-center gap-4 p-4" style={{ background: "radial-gradient(circle at 50% 0%, #1a0535 0%, #05010f 70%)" }}>
+      <nav className="w-full max-w-5xl flex items-center justify-between text-sm font-mono">
+        <span style={{ color: "#9c8bff" }}>NEON.PARKOUR</span>
+        {userId ? (
+          <div className="flex items-center gap-3">
+            <span style={{ color: "#22e6ff" }}>{profile?.username ?? "..."}</span>
+            <button
+              onClick={async () => {
+                await supabase.auth.signOut();
+              }}
+              className="px-3 py-1 rounded border"
+              style={{ borderColor: "#ff2bd6", color: "#ff2bd6" }}
+            >
+              ВЫЙТИ
+            </button>
+          </div>
+        ) : (
+          <Link
+            to="/auth"
+            className="px-3 py-1 rounded font-bold"
+            style={{ background: "#fffb00", color: "#1a0535", boxShadow: "0 0 20px #fffb00" }}
+          >
+            ВОЙТИ / РЕГИСТРАЦИЯ
+          </Link>
+        )}
+      </nav>
+
       <header className="text-center">
         <h1 className="text-4xl md:text-5xl font-black tracking-tight" style={{ color: "#fffb00", textShadow: "0 0 20px #ff2bd6" }}>
           NEON PARKOUR
@@ -240,29 +337,62 @@ function Game() {
         </p>
       </header>
 
-      <div className="relative rounded-xl overflow-hidden" style={{ boxShadow: "0 0 60px rgba(255,43,214,0.4)", border: "1px solid #ff2bd6" }}>
-        <canvas ref={canvasRef} className="block max-w-full h-auto" />
-        <div className="absolute top-3 left-4 font-mono text-lg" style={{ color: "#22e6ff", textShadow: "0 0 10px #22e6ff" }}>
-          SCORE {score}
-        </div>
-        <div className="absolute top-3 right-4 font-mono text-lg" style={{ color: "#ff2bd6", textShadow: "0 0 10px #ff2bd6" }}>
-          BEST {best}
-        </div>
-        {dead && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4" style={{ background: "rgba(5,1,15,0.8)" }}>
-            <div className="text-5xl font-black" style={{ color: "#ff2bd6", textShadow: "0 0 20px #ff2bd6" }}>
-              YOU FELL
-            </div>
-            <div className="text-xl font-mono" style={{ color: "#fffb00" }}>Score: {score}</div>
-            <button
-              onClick={() => restartRef.current()}
-              className="px-6 py-3 font-bold rounded-lg transition-transform hover:scale-105"
-              style={{ background: "#fffb00", color: "#1a0535", boxShadow: "0 0 30px #fffb00" }}
-            >
-              RUN AGAIN
-            </button>
+      <div className="flex flex-col lg:flex-row gap-4 items-start justify-center w-full max-w-5xl">
+        <div className="relative rounded-xl overflow-hidden flex-shrink-0" style={{ boxShadow: "0 0 60px rgba(255,43,214,0.4)", border: "1px solid #ff2bd6" }}>
+          <canvas ref={canvasRef} className="block max-w-full h-auto" />
+          <div className="absolute top-3 left-4 font-mono text-lg" style={{ color: "#22e6ff", textShadow: "0 0 10px #22e6ff" }}>
+            SCORE {score}
           </div>
-        )}
+          <div className="absolute top-3 right-4 font-mono text-lg" style={{ color: "#ff2bd6", textShadow: "0 0 10px #ff2bd6" }}>
+            BEST {best}
+          </div>
+          {dead && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4" style={{ background: "rgba(5,1,15,0.8)" }}>
+              <div className="text-5xl font-black" style={{ color: "#ff2bd6", textShadow: "0 0 20px #ff2bd6" }}>
+                YOU FELL
+              </div>
+              <div className="text-xl font-mono" style={{ color: "#fffb00" }}>Score: {score}</div>
+              {!userId && (
+                <Link to="/auth" className="text-xs underline" style={{ color: "#22e6ff" }}>
+                  Войди, чтобы сохранить рекорд
+                </Link>
+              )}
+              {userId && submitting && (
+                <div className="text-xs font-mono" style={{ color: "#22e6ff" }}>сохраняем...</div>
+              )}
+              <button
+                onClick={() => restartRef.current()}
+                className="px-6 py-3 font-bold rounded-lg transition-transform hover:scale-105"
+                style={{ background: "#fffb00", color: "#1a0535", boxShadow: "0 0 30px #fffb00" }}
+              >
+                RUN AGAIN
+              </button>
+            </div>
+          )}
+        </div>
+
+        <aside
+          className="w-full lg:w-72 rounded-xl p-4 font-mono"
+          style={{ background: "rgba(10,4,32,0.7)", border: "1px solid #22e6ff", boxShadow: "0 0 30px rgba(34,230,255,0.2)" }}
+        >
+          <h2 className="text-lg font-black mb-3" style={{ color: "#22e6ff", textShadow: "0 0 10px #22e6ff" }}>
+            ТОП-10
+          </h2>
+          {leaders.length === 0 ? (
+            <p className="text-xs" style={{ color: "#9c8bff" }}>Пока пусто. Стань первым!</p>
+          ) : (
+            <ol className="flex flex-col gap-2 text-sm">
+              {leaders.map((l, i) => (
+                <li key={i} className="flex items-center justify-between gap-2">
+                  <span style={{ color: i === 0 ? "#fffb00" : "#9c8bff" }}>
+                    {String(i + 1).padStart(2, "0")}. {l.username}
+                  </span>
+                  <span style={{ color: "#ff2bd6" }}>{l.best_score}</span>
+                </li>
+              ))}
+            </ol>
+          )}
+        </aside>
       </div>
     </main>
   );
