@@ -1,5 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+type LeaderRow = { username: string; best_score: number };
+type Profile = { username: string; best_score: number };
 
 export const Route = createFileRoute("/")({
   head: () => ({
