@@ -23,10 +23,79 @@ function Game() {
   const [best, setBest] = useState(0);
   const [dead, setDead] = useState(false);
   const restartRef = useRef<() => void>(() => {});
+  const [userId, setUserId] = useState<string | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [leaders, setLeaders] = useState<LeaderRow[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const lastSubmittedRef = useRef<number>(-1);
+
+  async function loadLeaders() {
+    const { data } = await supabase
+      .from("profiles")
+      .select("username,best_score")
+      .order("best_score", { ascending: false })
+      .limit(10);
+    if (data) setLeaders(data);
+  }
+
+  async function loadProfile(uid: string) {
+    const { data } = await supabase
+      .from("profiles")
+      .select("username,best_score")
+      .eq("user_id", uid)
+      .maybeSingle();
+    if (data) {
+      setProfile(data);
+      setBest(data.best_score);
+    }
+  }
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      const uid = data.session?.user.id ?? null;
+      setUserId(uid);
+      if (uid) loadProfile(uid);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      const uid = session?.user.id ?? null;
+      setUserId(uid);
+      if (uid) loadProfile(uid);
+      else setProfile(null);
+    });
+    loadLeaders();
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  async function submitScore(finalScore: number) {
+    if (!userId || finalScore <= 0) return;
+    if (lastSubmittedRef.current === finalScore) return;
+    lastSubmittedRef.current = finalScore;
+    setSubmitting(true);
+    try {
+      await supabase.from("scores").insert({ user_id: userId, score: finalScore });
+      if (profile && finalScore > profile.best_score) {
+        await supabase
+          .from("profiles")
+          .update({ best_score: finalScore })
+          .eq("user_id", userId);
+        setProfile({ ...profile, best_score: finalScore });
+      }
+      await loadLeaders();
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  useEffect(() => {
+    if (dead && score > 0) submitScore(score);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dead, score]);
 
   useEffect(() => {
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext("2d")!;
+    const W = (canvas.width = 960);
+    const H = (canvas.height = 540);
     const W = (canvas.width = 960);
     const H = (canvas.height = 540);
 
