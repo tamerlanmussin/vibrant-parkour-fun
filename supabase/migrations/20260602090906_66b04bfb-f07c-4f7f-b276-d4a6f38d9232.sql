@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.validate_best_score_update() FROM PUBLIC, anon, authenticated;
