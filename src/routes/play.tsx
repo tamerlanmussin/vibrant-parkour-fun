@@ -388,6 +388,175 @@ function drawBackdrop(ctx: CanvasRenderingContext2D, theme: Theme, cam: number, 
       ctx.fillStyle = `rgba(255,255,255,${a})`;
       ctx.fillRect(sx, sy, rand(i + 1) > 0.85 ? 2 : 1, 1);
     }
+  } else if (theme === "cyber") {
+    const off = cam * 0.25;
+    ctx.strokeStyle = "rgba(34,211,238,0.25)"; ctx.lineWidth = 1;
+    for (let i = 0; i < 18; i++) {
+      const y = horizon + i * 12;
+      if (y > H) break;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 130 - (off % 130);
+      const h = 90 + rand(i + 3) * 130;
+      ctx.fillStyle = "rgba(244,114,182,0.45)";
+      ctx.fillRect(sx, horizon - h, 60, h);
+      ctx.fillStyle = "rgba(34,211,238,0.7)";
+      ctx.fillRect(sx + 25, horizon - h - 10, 10, 10);
+    }
+  } else if (theme === "space") {
+    for (let i = 0; i < 160; i++) {
+      const sx = ((i * 151 - cam * 0.15) % W + W) % W;
+      const sy = (i * 97) % H;
+      const a = 0.4 + rand(i) * 0.6;
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.fillRect(sx, sy, rand(i + 2) > 0.9 ? 3 : 1, 1);
+    }
+    const off = cam * 0.3;
+    for (let i = -2; i < 20; i++) {
+      const sx = i * 200 - (off % 200);
+      ctx.fillStyle = "rgba(167,139,250,0.2)";
+      ctx.beginPath(); ctx.arc(sx, 90, 40 + rand(i) * 20, 0, Math.PI * 2); ctx.fill();
+    }
+  } else if (theme === "swamp") {
+    const off1 = cam * 0.2;
+    ctx.fillStyle = "rgba(20,40,10,0.6)";
+    ctx.beginPath(); ctx.moveTo(0, H);
+    for (let x = 0; x <= W; x += 20) {
+      const wx = x + off1;
+      const y = horizon - 20 - Math.sin(wx * 0.008) * 30;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+    const off2 = cam * 0.4;
+    for (let i = -2; i < 35; i++) {
+      const sx = i * 90 - (off2 % 90);
+      const h = 50 + rand(i + 7) * 40;
+      ctx.fillStyle = "rgba(10,30,5,0.8)";
+      ctx.beginPath();
+      ctx.moveTo(sx + 20, horizon);
+      ctx.quadraticCurveTo(sx + 45, horizon - h, sx + 70, horizon);
+      ctx.closePath(); ctx.fill();
+    }
+  } else if (theme === "candy") {
+    const off = cam * 0.3;
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 110 - (off % 110);
+      const h = 70 + rand(i + 4) * 80;
+      ctx.fillStyle = "rgba(249,168,212,0.45)";
+      ctx.beginPath();
+      ctx.moveTo(sx, horizon);
+      ctx.lineTo(sx + 55, horizon - h);
+      ctx.lineTo(sx + 110, horizon);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "rgba(192,132,252,0.5)";
+      ctx.fillRect(sx + 45, horizon - h - 8, 20, 8);
+    }
+  } else if (theme === "graveyard") {
+    const off = cam * 0.25;
+    for (let i = -2; i < 35; i++) {
+      const sx = i * 70 - (off % 70);
+      const h = 30 + rand(i + 5) * 25;
+      ctx.fillStyle = "rgba(75,85,99,0.7)";
+      ctx.fillRect(sx + 20, horizon - h, 8, h);
+      ctx.fillRect(sx + 8, horizon - h, 32, 8);
+    }
+    for (let i = 0; i < 80; i++) {
+      const sx = ((i * 113 - cam * 0.5) % W + W) % W;
+      const sy = (i * 67) % H;
+      ctx.fillStyle = `rgba(16,185,129,${0.2 + rand(i) * 0.4})`;
+      ctx.fillRect(sx, sy, 2, 2);
+    }
+  } else if (theme === "underwater") {
+    const off = cam * 0.2;
+    ctx.fillStyle = "rgba(14,165,233,0.25)";
+    ctx.beginPath(); ctx.moveTo(0, H);
+    for (let x = 0; x <= W; x += 20) {
+      const wx = x + off;
+      const y = horizon - 15 - Math.sin(wx * 0.006) * 25;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+    for (let i = -2; i < 25; i++) {
+      const sx = i * 160 - (off % 160);
+      ctx.fillStyle = "rgba(34,211,238,0.25)";
+      ctx.beginPath();
+      ctx.arc(sx, 80 + rand(i) * 40, 10 + rand(i + 3) * 15, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  } else if (theme === "sunset") {
+    const off1 = cam * 0.15;
+    ctx.fillStyle = "rgba(251,146,60,0.3)";
+    ctx.beginPath(); ctx.moveTo(0, H);
+    for (let x = 0; x <= W; x += 20) {
+      const wx = x + off1;
+      const y = horizon - 40 - Math.sin(wx * 0.01) * 50;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+    const off2 = cam * 0.35;
+    ctx.fillStyle = "rgba(244,63,94,0.35)";
+    ctx.beginPath(); ctx.moveTo(0, H);
+    for (let x = 0; x <= W; x += 20) {
+      const wx = x + off2;
+      const y = horizon + 5 - Math.sin(wx * 0.008 + 2) * 35;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "rgba(251,191,36,0.5)";
+    ctx.beginPath(); ctx.arc(W * 0.8, 120, 70, 0, Math.PI * 2); ctx.fill();
+  } else if (theme === "factory") {
+    const off = cam * 0.25;
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 140 - (off % 140);
+      const h = 110 + rand(i + 2) * 130;
+      ctx.fillStyle = "rgba(60,60,60,0.7)";
+      ctx.fillRect(sx, horizon - h, 100, h);
+      ctx.fillStyle = "rgba(250,204,21,0.6)";
+      for (let wy = horizon - h + 10; wy < horizon - 10; wy += 18) {
+        for (let wx = sx + 10; wx < sx + 90; wx += 20) {
+          if (rand(i * 60 + wy + wx) > 0.5) ctx.fillRect(wx, wy, 8, 8);
+        }
+      }
+    }
+    for (let i = 0; i < 40; i++) {
+      const sx = ((i * 131 - cam * 0.4) % W + W) % W;
+      const sy = (i * 53) % (H / 2);
+      ctx.fillStyle = `rgba(239,68,68,${0.3 + rand(i) * 0.5})`;
+      ctx.fillRect(sx, sy, 2, 2);
+    }
+  } else if (theme === "crystal") {
+    const off = cam * 0.2;
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 120 - (off % 120);
+      const h = 80 + rand(i + 6) * 100;
+      ctx.fillStyle = "rgba(34,211,238,0.35)";
+      ctx.beginPath();
+      ctx.moveTo(sx + 30, horizon);
+      ctx.lineTo(sx + 60, horizon - h);
+      ctx.lineTo(sx + 90, horizon);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = "rgba(167,139,250,0.4)"; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(sx + 30, horizon);
+      ctx.lineTo(sx + 60, horizon - h);
+      ctx.lineTo(sx + 90, horizon);
+      ctx.closePath(); ctx.stroke();
+    }
+  } else if (theme === "abyss") {
+    for (let i = 0; i < 180; i++) {
+      const sx = ((i * 149 - cam * 0.2) % W + W) % W;
+      const sy = (i * 83) % H;
+      const a = 0.2 + rand(i) * 0.8;
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.fillRect(sx, sy, rand(i + 1) > 0.9 ? 3 : 1, 1);
+    }
+    const off = cam * 0.4;
+    for (let i = -2; i < 20; i++) {
+      const sx = i * 250 - (off % 250);
+      ctx.fillStyle = "rgba(239,68,68,0.15)";
+      ctx.beginPath(); ctx.arc(sx, 100, 50, 0, Math.PI * 2); ctx.fill();
+    }
   }
 }
 
