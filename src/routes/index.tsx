@@ -27,6 +27,7 @@ function Game() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [leaders, setLeaders] = useState<LeaderRow[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [showRules, setShowRules] = useState(false);
   const lastSubmittedRef = useRef<number>(-1);
 
   async function loadLeaders() {
@@ -304,29 +305,98 @@ function Game() {
     <main className="min-h-screen flex flex-col items-center gap-4 p-4" style={{ background: "radial-gradient(circle at 50% 0%, #1a0535 0%, #05010f 70%)" }}>
       <nav className="w-full max-w-5xl flex items-center justify-between text-sm font-mono">
         <span style={{ color: "#9c8bff" }}>NEON.PARKOUR</span>
-        {userId ? (
-          <div className="flex items-center gap-3">
-            <span style={{ color: "#22e6ff" }}>{profile?.username ?? "..."}</span>
-            <button
-              onClick={async () => {
-                await supabase.auth.signOut();
-              }}
-              className="px-3 py-1 rounded border"
-              style={{ borderColor: "#ff2bd6", color: "#ff2bd6" }}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowRules(true)}
+            className="px-3 py-1 rounded border"
+            style={{ borderColor: "#22e6ff", color: "#22e6ff" }}
+          >
+            ПРАВИЛА
+          </button>
+          {userId ? (
+            <>
+              <span style={{ color: "#22e6ff" }}>{profile?.username ?? "..."}</span>
+              <button
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                }}
+                className="px-3 py-1 rounded border"
+                style={{ borderColor: "#ff2bd6", color: "#ff2bd6" }}
+              >
+                ВЫЙТИ
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/auth"
+              className="px-3 py-1 rounded font-bold"
+              style={{ background: "#fffb00", color: "#1a0535", boxShadow: "0 0 20px #fffb00" }}
             >
-              ВЫЙТИ
+              ВОЙТИ / РЕГИСТРАЦИЯ
+            </Link>
+          )}
+        </div>
+      </nav>
+
+      {showRules && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(5,1,15,0.85)" }}
+          onClick={() => setShowRules(false)}
+        >
+          <div
+            className="max-w-lg w-full rounded-xl p-6 font-mono"
+            style={{ background: "#0a0420", border: "1px solid #ff2bd6", boxShadow: "0 0 60px rgba(255,43,214,0.5)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-black" style={{ color: "#fffb00", textShadow: "0 0 10px #ff2bd6" }}>
+                ПРАВИЛА ИГРЫ
+              </h2>
+              <button
+                onClick={() => setShowRules(false)}
+                className="text-xl px-2"
+                style={{ color: "#ff2bd6" }}
+                aria-label="Закрыть"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="flex flex-col gap-3 text-sm" style={{ color: "#9c8bff" }}>
+              <div>
+                <div style={{ color: "#22e6ff" }} className="font-bold mb-1">🎮 УПРАВЛЕНИЕ</div>
+                <p>A / D или ← / → — бег</p>
+                <p>Space / W / ↑ — прыжок (двойной в воздухе)</p>
+                <p>У стены — wall-jump (отталкивание)</p>
+              </div>
+              <div>
+                <div style={{ color: "#22e6ff" }} className="font-bold mb-1">⚙️ МЕХАНИКА</div>
+                <p>Персонажа автоматически тянет вперёд</p>
+                <p>Платформы генерируются бесконечно</p>
+                <p>Упал вниз — конец забега</p>
+              </div>
+              <div>
+                <div style={{ color: "#22e6ff" }} className="font-bold mb-1">🏆 ОЧКИ</div>
+                <p>Считаются по пройденной дистанции</p>
+                <p>Войди в аккаунт — рекорд попадёт в ТОП-10</p>
+              </div>
+              <div>
+                <div style={{ color: "#22e6ff" }} className="font-bold mb-1">🎨 ЦВЕТА</div>
+                <p><span style={{ color: "#fffb00" }}>● Жёлтый</span> — игрок</p>
+                <p><span style={{ color: "#22e6ff" }}>● Голубой</span> — платформы</p>
+                <p><span style={{ color: "#ff2bd6" }}>● Розовый</span> — стены (wall-jump)</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowRules(false)}
+              className="mt-5 w-full py-3 font-bold rounded-lg"
+              style={{ background: "#fffb00", color: "#1a0535", boxShadow: "0 0 20px #fffb00" }}
+            >
+              ПОНЯТНО, БЕЖИМ
             </button>
           </div>
-        ) : (
-          <Link
-            to="/auth"
-            className="px-3 py-1 rounded font-bold"
-            style={{ background: "#fffb00", color: "#1a0535", boxShadow: "0 0 20px #fffb00" }}
-          >
-            ВОЙТИ / РЕГИСТРАЦИЯ
-          </Link>
-        )}
-      </nav>
+        </div>
+      )}
 
       <header className="text-center">
         <h1 className="text-4xl md:text-5xl font-black tracking-tight" style={{ color: "#fffb00", textShadow: "0 0 20px #ff2bd6" }}>
