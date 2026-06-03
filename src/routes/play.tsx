@@ -150,6 +150,26 @@ function drawShape(ctx: CanvasRenderingContext2D, shape: Shape, x: number, y: nu
       ctx.closePath(); ctx.fill(); ctx.stroke();
       break;
     }
+    case "quad": {
+      // outer cube
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+      // 4 inner cubes — 2x2 grid with different colors
+      const pad = Math.max(2, w * 0.12);
+      const gap = Math.max(1, w * 0.05);
+      const innerW = (w - pad * 2 - gap) / 2;
+      const innerH = (h - pad * 2 - gap) / 2;
+      const colors = ["#e22718", "#1c69d4", "#22e6ff", "#a3e635"];
+      for (let i = 0; i < 4; i++) {
+        const ix = x + pad + (i % 2) * (innerW + gap);
+        const iy = y + pad + Math.floor(i / 2) * (innerH + gap);
+        ctx.fillStyle = colors[i];
+        ctx.fillRect(ix, iy, innerW, innerH);
+        ctx.strokeStyle = stroke;
+        ctx.strokeRect(ix + 0.5, iy + 0.5, innerW - 1, innerH - 1);
+      }
+      break;
+    }
   }
 }
 
