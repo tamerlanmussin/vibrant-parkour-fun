@@ -753,12 +753,51 @@ function Game() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dead, won, score]);
 
-  // unlock next level on win
+  // unlock next level on win (only for standard levels)
   useEffect(() => {
-    if (won && level.id < LEVELS.length && level.id >= unlocked) {
+    if (won && level.id < 1000 && level.id < LEVELS.length && level.id >= unlocked) {
       setUnlocked(level.id + 1);
     }
   }, [won, level.id, unlocked]);
+
+  function openCreateEditor() {
+    const nextId = 1000 + customLevels.length + 1;
+    setEditorDraft({
+      id: nextId,
+      name: `МОЙ УРОВЕНЬ ${customLevels.length + 1}`,
+      target: 500,
+      gapMin: 120,
+      gapMax: 240,
+      wallChance: 0.5,
+      gravity: 0.44,
+      speed: 5.5,
+      bgTop: "#1a2129",
+      bgBot: "#262e38",
+      ground: "#22e6ff",
+      wall: "#ec4899",
+      theme: "neon",
+    });
+    setEditorOpen(true);
+  }
+  function openEditEditor(l: Level) {
+    setEditorDraft({ ...l });
+    setEditorOpen(true);
+  }
+  function saveEditor() {
+    if (!editorDraft) return;
+    const exists = customLevels.find((l) => l.id === editorDraft.id);
+    if (exists) {
+      setCustomLevels(customLevels.map((l) => l.id === editorDraft.id ? editorDraft : l));
+    } else {
+      setCustomLevels([...customLevels, editorDraft]);
+    }
+    setEditorOpen(false);
+    setEditorDraft(null);
+  }
+  function deleteCustom(id: number) {
+    setCustomLevels(customLevels.filter((l) => l.id !== id));
+    if (levelId === id) setLevelId(1);
+  }
 
   useEffect(() => {
     const canvas = canvasRef.current!;
