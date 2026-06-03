@@ -12,6 +12,9 @@ export const Route = createFileRoute("/play")({
   component: Game,
 });
 
+type LeaderRow = { username: string; best_score: number };
+type Profile = { username: string; best_score: number };
+
 type Platform = { x: number; y: number; w: number; h: number; kind: "ground" | "wall" };
 
 function Game() {
