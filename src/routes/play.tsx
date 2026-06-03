@@ -16,7 +16,7 @@ type LeaderRow = { username: string; best_score: number };
 type Profile = { username: string; best_score: number };
 type Platform = { x: number; y: number; w: number; h: number; kind: "ground" | "wall" };
 
-type Theme = "warmup" | "city" | "desert" | "jungle" | "neon" | "arctic" | "volcano" | "void" | "cyber" | "space" | "swamp" | "candy" | "graveyard" | "underwater" | "sunset" | "factory" | "crystal" | "abyss";
+type Theme = "warmup" | "city" | "desert" | "jungle" | "neon" | "arctic" | "volcano" | "void" | "cyber" | "space" | "swamp" | "candy" | "graveyard" | "underwater" | "sunset" | "factory" | "crystal" | "abyss" | "aurora" | "omega";
 
 type Level = {
   id: number;
@@ -52,7 +52,9 @@ const LEVELS: Level[] = [
   { id: 15, name: "ТРАССА 15 · ЗАКАТ", target: 6000, gapMin: 230, gapMax: 460, wallChance: 0.70, gravity: 0.49, speed: 8.4, bgTop: "#2a0a05", bgBot: "#4a1a0a", ground: "#fb923c", wall: "#f43f5e", theme: "sunset" },
   { id: 16, name: "ТРАССА 16 · ФАБРИКА", target: 6700, gapMin: 240, gapMax: 480, wallChance: 0.70, gravity: 0.50, speed: 8.6, bgTop: "#1a1a1a", bgBot: "#262626", ground: "#facc15", wall: "#ef4444", theme: "factory" },
   { id: 17, name: "ТРАССА 17 · КРИСТАЛЛЫ", target: 7500, gapMin: 250, gapMax: 500, wallChance: 0.72, gravity: 0.50, speed: 8.8, bgTop: "#0a0a1a", bgBot: "#1a1a2e", ground: "#22d3ee", wall: "#a78bfa", theme: "crystal" },
-  { id: 18, name: "ТРАССА 18 · БЕСКОНЕЧНОСТЬ", target: 9999, gapMin: 260, gapMax: 520, wallChance: 0.72, gravity: 0.50, speed: 9.0, bgTop: "#000000", bgBot: "#050505", ground: "#ffffff", wall: "#ef4444", theme: "abyss" },
+  { id: 18, name: "ТРАССА 18 · БЕЗДНА", target: 8200, gapMin: 260, gapMax: 520, wallChance: 0.72, gravity: 0.50, speed: 9.0, bgTop: "#000000", bgBot: "#050505", ground: "#ffffff", wall: "#ef4444", theme: "abyss" },
+  { id: 19, name: "ТРАССА 19 · СИЯНИЕ", target: 9000, gapMin: 270, gapMax: 540, wallChance: 0.74, gravity: 0.50, speed: 9.2, bgTop: "#050a10", bgBot: "#0a1a15", ground: "#34d399", wall: "#a78bfa", theme: "aurora" },
+  { id: 20, name: "ТРАССА 20 · ОМЕГА", target: 9999, gapMin: 280, gapMax: 560, wallChance: 0.75, gravity: 0.52, speed: 9.5, bgTop: "#0a0000", bgBot: "#1a0505", ground: "#fbbf24", wall: "#ef4444", theme: "omega" },
 ];
 
 
@@ -556,6 +558,47 @@ function drawBackdrop(ctx: CanvasRenderingContext2D, theme: Theme, cam: number, 
       const sx = i * 250 - (off % 250);
       ctx.fillStyle = "rgba(239,68,68,0.15)";
       ctx.beginPath(); ctx.arc(sx, 100, 50, 0, Math.PI * 2); ctx.fill();
+    }
+  } else if (theme === "aurora") {
+    const off = cam * 0.1;
+    for (let i = 0; i < 5; i++) {
+      const waveY = 60 + i * 35;
+      ctx.strokeStyle = `rgba(${52 + i * 20},${211 - i * 15},${167 + i * 10},0.35)`;
+      ctx.lineWidth = 3 + i;
+      ctx.beginPath(); ctx.moveTo(0, waveY);
+      for (let x = 0; x <= W; x += 10) {
+        const wx = x + off + i * 50;
+        const y = waveY + Math.sin(wx * 0.005 + i) * 20 + Math.sin(wx * 0.01 + i * 2) * 10;
+        ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    for (let i = 0; i < 100; i++) {
+      const sx = ((i * 131 - cam * 0.15) % W + W) % W;
+      const sy = (i * 79) % (H / 2);
+      const a = 0.3 + rand(i) * 0.5;
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.fillRect(sx, sy, 1, 1);
+    }
+  } else if (theme === "omega") {
+    for (let i = 0; i < 200; i++) {
+      const sx = ((i * 157 - cam * 0.25) % W + W) % W;
+      const sy = (i * 89) % H;
+      const a = 0.15 + rand(i) * 0.85;
+      ctx.fillStyle = `rgba(255,${200 + rand(i + 1) * 55},${rand(i + 2) * 100},${a})`;
+      ctx.fillRect(sx, sy, rand(i + 3) > 0.9 ? 3 : 1, 1);
+    }
+    const off = cam * 0.3;
+    for (let i = -2; i < 20; i++) {
+      const sx = i * 300 - (off % 300);
+      ctx.fillStyle = "rgba(251,191,36,0.12)";
+      ctx.beginPath(); ctx.arc(sx, 80, 80, 0, Math.PI * 2); ctx.fill();
+    }
+    for (let i = 0; i < 30; i++) {
+      const sx = ((i * 167 - cam * 0.5) % W + W) % W;
+      const sy = (i * 61) % H;
+      ctx.fillStyle = `rgba(239,68,68,${0.2 + rand(i) * 0.4})`;
+      ctx.fillRect(sx, sy, 2, 2);
     }
   }
 }
