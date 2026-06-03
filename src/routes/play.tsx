@@ -493,7 +493,7 @@ function Game() {
     function update() {
       if (!alive || finished) return;
       const L = levelRef.current;
-      const accel = 1.2;
+      const accel = 0.9;
       const max = L.speed;
       if (keys["ArrowLeft"] || keys["KeyA"]) player.vx = Math.max(player.vx - accel, -max);
       else if (keys["ArrowRight"] || keys["KeyD"]) player.vx = Math.min(player.vx + accel, max);
@@ -501,7 +501,7 @@ function Game() {
 
       const jumpPressed = keys["Space"] || keys["ArrowUp"] || keys["KeyW"];
       if (jumpPressed && !jumpHeld) {
-        if (player.onWall !== 0) { player.vy = -11; player.vx = -player.onWall * 7; player.jumps = 1; }
+        if (player.onWall !== 0) { player.vy = -11; player.vx = -player.onWall * 5.5; player.jumps = 1; }
         else if (player.jumps > 0) { player.vy = -11; player.jumps--; }
       }
       jumpHeld = jumpPressed;
