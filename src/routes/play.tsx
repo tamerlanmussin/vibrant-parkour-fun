@@ -151,6 +151,19 @@ function drawShape(ctx: CanvasRenderingContext2D, shape: Shape, x: number, y: nu
   }
 }
 
+function ShapeSwatch({ shape, body, stroke }: { shape: Shape; body: string; stroke: string }) {
+  // Render via canvas API on mount to reuse drawShape exactly
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const c = ref.current; if (!c) return;
+    const ctx = c.getContext("2d"); if (!ctx) return;
+    ctx.clearRect(0, 0, c.width, c.height);
+    drawShape(ctx, shape, 6, 6, 28, 28, body, stroke);
+  }, [shape, body, stroke]);
+  return <canvas ref={ref} width={40} height={40} className="w-full h-full" />;
+}
+
+
 
 // Hash-based pseudo-random for stable parallax scenery
 function rand(seed: number) {
