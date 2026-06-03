@@ -646,6 +646,19 @@ function Game() {
     return localStorage.getItem("np_last_claim") ?? "";
   });
   const [giftPopup, setGiftPopup] = useState<Skin[] | null>(null);
+  const [customLevels, setCustomLevels] = useState<Level[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = localStorage.getItem("np_custom_levels");
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return [];
+  });
+  const [levelTab, setLevelTab] = useState<"std" | "custom">("std");
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editorDraft, setEditorDraft] = useState<Level | null>(null);
+
+  useEffect(() => { localStorage.setItem("np_custom_levels", JSON.stringify(customLevels)); }, [customLevels]);
 
   // Seed defaults on first mount if owned is empty
   useEffect(() => {
@@ -653,7 +666,8 @@ function Game() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const level = useMemo(() => LEVELS.find((l) => l.id === levelId) ?? LEVELS[0], [levelId]);
+  const ALL_LEVELS = useMemo(() => [...LEVELS, ...customLevels], [customLevels]);
+  const level = useMemo(() => ALL_LEVELS.find((l) => l.id === levelId) ?? LEVELS[0], [ALL_LEVELS, levelId]);
   const skin = useMemo(() => SKINS.find((s) => s.id === skinId) ?? SKINS[0], [skinId]);
 
   const levelRef = useRef(level);
