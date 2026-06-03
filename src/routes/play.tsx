@@ -16,7 +16,7 @@ type LeaderRow = { username: string; best_score: number };
 type Profile = { username: string; best_score: number };
 type Platform = { x: number; y: number; w: number; h: number; kind: "ground" | "wall" };
 
-type Theme = "warmup" | "city" | "desert" | "jungle" | "neon" | "arctic" | "volcano" | "void";
+type Theme = "warmup" | "city" | "desert" | "jungle" | "neon" | "arctic" | "volcano" | "void" | "cyber" | "space" | "swamp" | "candy" | "graveyard" | "underwater" | "sunset" | "factory" | "crystal" | "abyss";
 
 type Level = {
   id: number;
@@ -35,14 +35,24 @@ type Level = {
 };
 
 const LEVELS: Level[] = [
-  { id: 1, name: "ТРАССА 01 · РАЗМИНКА",     target: 200,  gapMin: 80,  gapMax: 180, wallChance: 0.25, gravity: 0.40, speed: 4.5, bgTop: "#1a2129", bgBot: "#262e38", ground: "#1c69d4", wall: "#e22718", theme: "warmup" },
-  { id: 2, name: "ТРАССА 02 · ГОРОД",        target: 400,  gapMin: 100, gapMax: 200, wallChance: 0.40, gravity: 0.42, speed: 5.0, bgTop: "#0c1a2a", bgBot: "#1a3045", ground: "#00b3d4", wall: "#ff5a1f", theme: "city" },
-  { id: 3, name: "ТРАССА 03 · ПУСТЫНЯ",      target: 600,  gapMin: 110, gapMax: 220, wallChance: 0.45, gravity: 0.40, speed: 5.5, bgTop: "#3a1a05", bgBot: "#5a2d0a", ground: "#e8a35a", wall: "#c2410c", theme: "desert" },
-  { id: 4, name: "ТРАССА 04 · ДЖУНГЛИ",      target: 850,  gapMin: 120, gapMax: 240, wallChance: 0.50, gravity: 0.46, speed: 5.8, bgTop: "#0a1f10", bgBot: "#143a1f", ground: "#22c55e", wall: "#fbbf24", theme: "jungle" },
-  { id: 5, name: "ТРАССА 05 · НОЧНОЙ НЕОН",  target: 1100, gapMin: 130, gapMax: 260, wallChance: 0.55, gravity: 0.44, speed: 6.0, bgTop: "#1a0535", bgBot: "#0a0420", ground: "#a855f7", wall: "#ec4899", theme: "neon" },
-  { id: 6, name: "ТРАССА 06 · АРКТИКА",      target: 1400, gapMin: 140, gapMax: 280, wallChance: 0.55, gravity: 0.42, speed: 6.2, bgTop: "#0a2540", bgBot: "#1a4a6e", ground: "#bae6fd", wall: "#3b82f6", theme: "arctic" },
-  { id: 7, name: "ТРАССА 07 · ВУЛКАН",       target: 1800, gapMin: 150, gapMax: 300, wallChance: 0.60, gravity: 0.48, speed: 6.5, bgTop: "#1a0505", bgBot: "#3a0a0a", ground: "#f97316", wall: "#dc2626", theme: "volcano" },
-  { id: 8, name: "ТРАССА 08 · БЕСКОНЕЧНОСТЬ", target: 9999, gapMin: 160, gapMax: 320, wallChance: 0.55, gravity: 0.46, speed: 6.8, bgTop: "#000000", bgBot: "#1a1a1a", ground: "#ffffff", wall: "#facc15", theme: "void" },
+  { id: 1, name: "ТРАССА 01 · РАЗМИНКА", target: 200, gapMin: 80, gapMax: 180, wallChance: 0.25, gravity: 0.40, speed: 4.5, bgTop: "#1a2129", bgBot: "#262e38", ground: "#1c69d4", wall: "#e22718", theme: "warmup" },
+  { id: 2, name: "ТРАССА 02 · ГОРОД", target: 400, gapMin: 100, gapMax: 200, wallChance: 0.40, gravity: 0.42, speed: 5.0, bgTop: "#0c1a2a", bgBot: "#1a3045", ground: "#00b3d4", wall: "#ff5a1f", theme: "city" },
+  { id: 3, name: "ТРАССА 03 · ПУСТЫНЯ", target: 600, gapMin: 110, gapMax: 220, wallChance: 0.45, gravity: 0.40, speed: 5.5, bgTop: "#3a1a05", bgBot: "#5a2d0a", ground: "#e8a35a", wall: "#c2410c", theme: "desert" },
+  { id: 4, name: "ТРАССА 04 · ДЖУНГЛИ", target: 850, gapMin: 120, gapMax: 240, wallChance: 0.50, gravity: 0.46, speed: 5.8, bgTop: "#0a1f10", bgBot: "#143a1f", ground: "#22c55e", wall: "#fbbf24", theme: "jungle" },
+  { id: 5, name: "ТРАССА 05 · НОЧНОЙ НЕОН", target: 1100, gapMin: 130, gapMax: 260, wallChance: 0.55, gravity: 0.44, speed: 6.0, bgTop: "#1a0535", bgBot: "#0a0420", ground: "#a855f7", wall: "#ec4899", theme: "neon" },
+  { id: 6, name: "ТРАССА 06 · АРКТИКА", target: 1400, gapMin: 140, gapMax: 280, wallChance: 0.55, gravity: 0.42, speed: 6.2, bgTop: "#0a2540", bgBot: "#1a4a6e", ground: "#bae6fd", wall: "#3b82f6", theme: "arctic" },
+  { id: 7, name: "ТРАССА 07 · ВУЛКАН", target: 1800, gapMin: 150, gapMax: 300, wallChance: 0.60, gravity: 0.48, speed: 6.5, bgTop: "#1a0505", bgBot: "#3a0a0a", ground: "#f97316", wall: "#dc2626", theme: "volcano" },
+  { id: 8, name: "ТРАССА 08 · ПУСТОТА", target: 2400, gapMin: 160, gapMax: 320, wallChance: 0.60, gravity: 0.46, speed: 7.0, bgTop: "#000000", bgBot: "#1a1a1a", ground: "#ffffff", wall: "#facc15", theme: "void" },
+  { id: 9, name: "ТРАССА 09 · КИБЕРПАНК", target: 2800, gapMin: 170, gapMax: 340, wallChance: 0.62, gravity: 0.46, speed: 7.2, bgTop: "#0a0a1a", bgBot: "#1a1a3a", ground: "#f472b6", wall: "#22d3ee", theme: "cyber" },
+  { id: 10, name: "ТРАССА 10 · КОСМОС", target: 3200, gapMin: 180, gapMax: 360, wallChance: 0.62, gravity: 0.47, speed: 7.4, bgTop: "#050510", bgBot: "#0a0a20", ground: "#a78bfa", wall: "#34d399", theme: "space" },
+  { id: 11, name: "ТРАССА 11 · БОЛОТО", target: 3700, gapMin: 190, gapMax: 380, wallChance: 0.65, gravity: 0.47, speed: 7.6, bgTop: "#0a1a0a", bgBot: "#142814", ground: "#65a30d", wall: "#3f6212", theme: "swamp" },
+  { id: 12, name: "ТРАССА 12 · КОНФЕТЫ", target: 4200, gapMin: 200, gapMax: 400, wallChance: 0.65, gravity: 0.48, speed: 7.8, bgTop: "#2a0a2a", bgBot: "#3a153a", ground: "#f9a8d4", wall: "#c084fc", theme: "candy" },
+  { id: 13, name: "ТРАССА 13 · КЛАДБИЩЕ", target: 4800, gapMin: 210, gapMax: 420, wallChance: 0.68, gravity: 0.48, speed: 8.0, bgTop: "#0a0a0a", bgBot: "#111111", ground: "#4b5563", wall: "#10b981", theme: "graveyard" },
+  { id: 14, name: "ТРАССА 14 · ПОДВОДНЫЙ", target: 5400, gapMin: 220, gapMax: 440, wallChance: 0.68, gravity: 0.49, speed: 8.2, bgTop: "#001a33", bgBot: "#002a4d", ground: "#22d3ee", wall: "#0ea5e9", theme: "underwater" },
+  { id: 15, name: "ТРАССА 15 · ЗАКАТ", target: 6000, gapMin: 230, gapMax: 460, wallChance: 0.70, gravity: 0.49, speed: 8.4, bgTop: "#2a0a05", bgBot: "#4a1a0a", ground: "#fb923c", wall: "#f43f5e", theme: "sunset" },
+  { id: 16, name: "ТРАССА 16 · ФАБРИКА", target: 6700, gapMin: 240, gapMax: 480, wallChance: 0.70, gravity: 0.50, speed: 8.6, bgTop: "#1a1a1a", bgBot: "#262626", ground: "#facc15", wall: "#ef4444", theme: "factory" },
+  { id: 17, name: "ТРАССА 17 · КРИСТАЛЛЫ", target: 7500, gapMin: 250, gapMax: 500, wallChance: 0.72, gravity: 0.50, speed: 8.8, bgTop: "#0a0a1a", bgBot: "#1a1a2e", ground: "#22d3ee", wall: "#a78bfa", theme: "crystal" },
+  { id: 18, name: "ТРАССА 18 · БЕСКОНЕЧНОСТЬ", target: 9999, gapMin: 260, gapMax: 520, wallChance: 0.72, gravity: 0.50, speed: 9.0, bgTop: "#000000", bgBot: "#050505", ground: "#ffffff", wall: "#ef4444", theme: "abyss" },
 ];
 
 
@@ -377,6 +387,175 @@ function drawBackdrop(ctx: CanvasRenderingContext2D, theme: Theme, cam: number, 
       const a = 0.3 + rand(i) * 0.7;
       ctx.fillStyle = `rgba(255,255,255,${a})`;
       ctx.fillRect(sx, sy, rand(i + 1) > 0.85 ? 2 : 1, 1);
+    }
+  } else if (theme === "cyber") {
+    const off = cam * 0.25;
+    ctx.strokeStyle = "rgba(34,211,238,0.25)"; ctx.lineWidth = 1;
+    for (let i = 0; i < 18; i++) {
+      const y = horizon + i * 12;
+      if (y > H) break;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 130 - (off % 130);
+      const h = 90 + rand(i + 3) * 130;
+      ctx.fillStyle = "rgba(244,114,182,0.45)";
+      ctx.fillRect(sx, horizon - h, 60, h);
+      ctx.fillStyle = "rgba(34,211,238,0.7)";
+      ctx.fillRect(sx + 25, horizon - h - 10, 10, 10);
+    }
+  } else if (theme === "space") {
+    for (let i = 0; i < 160; i++) {
+      const sx = ((i * 151 - cam * 0.15) % W + W) % W;
+      const sy = (i * 97) % H;
+      const a = 0.4 + rand(i) * 0.6;
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.fillRect(sx, sy, rand(i + 2) > 0.9 ? 3 : 1, 1);
+    }
+    const off = cam * 0.3;
+    for (let i = -2; i < 20; i++) {
+      const sx = i * 200 - (off % 200);
+      ctx.fillStyle = "rgba(167,139,250,0.2)";
+      ctx.beginPath(); ctx.arc(sx, 90, 40 + rand(i) * 20, 0, Math.PI * 2); ctx.fill();
+    }
+  } else if (theme === "swamp") {
+    const off1 = cam * 0.2;
+    ctx.fillStyle = "rgba(20,40,10,0.6)";
+    ctx.beginPath(); ctx.moveTo(0, H);
+    for (let x = 0; x <= W; x += 20) {
+      const wx = x + off1;
+      const y = horizon - 20 - Math.sin(wx * 0.008) * 30;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+    const off2 = cam * 0.4;
+    for (let i = -2; i < 35; i++) {
+      const sx = i * 90 - (off2 % 90);
+      const h = 50 + rand(i + 7) * 40;
+      ctx.fillStyle = "rgba(10,30,5,0.8)";
+      ctx.beginPath();
+      ctx.moveTo(sx + 20, horizon);
+      ctx.quadraticCurveTo(sx + 45, horizon - h, sx + 70, horizon);
+      ctx.closePath(); ctx.fill();
+    }
+  } else if (theme === "candy") {
+    const off = cam * 0.3;
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 110 - (off % 110);
+      const h = 70 + rand(i + 4) * 80;
+      ctx.fillStyle = "rgba(249,168,212,0.45)";
+      ctx.beginPath();
+      ctx.moveTo(sx, horizon);
+      ctx.lineTo(sx + 55, horizon - h);
+      ctx.lineTo(sx + 110, horizon);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "rgba(192,132,252,0.5)";
+      ctx.fillRect(sx + 45, horizon - h - 8, 20, 8);
+    }
+  } else if (theme === "graveyard") {
+    const off = cam * 0.25;
+    for (let i = -2; i < 35; i++) {
+      const sx = i * 70 - (off % 70);
+      const h = 30 + rand(i + 5) * 25;
+      ctx.fillStyle = "rgba(75,85,99,0.7)";
+      ctx.fillRect(sx + 20, horizon - h, 8, h);
+      ctx.fillRect(sx + 8, horizon - h, 32, 8);
+    }
+    for (let i = 0; i < 80; i++) {
+      const sx = ((i * 113 - cam * 0.5) % W + W) % W;
+      const sy = (i * 67) % H;
+      ctx.fillStyle = `rgba(16,185,129,${0.2 + rand(i) * 0.4})`;
+      ctx.fillRect(sx, sy, 2, 2);
+    }
+  } else if (theme === "underwater") {
+    const off = cam * 0.2;
+    ctx.fillStyle = "rgba(14,165,233,0.25)";
+    ctx.beginPath(); ctx.moveTo(0, H);
+    for (let x = 0; x <= W; x += 20) {
+      const wx = x + off;
+      const y = horizon - 15 - Math.sin(wx * 0.006) * 25;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+    for (let i = -2; i < 25; i++) {
+      const sx = i * 160 - (off % 160);
+      ctx.fillStyle = "rgba(34,211,238,0.25)";
+      ctx.beginPath();
+      ctx.arc(sx, 80 + rand(i) * 40, 10 + rand(i + 3) * 15, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  } else if (theme === "sunset") {
+    const off1 = cam * 0.15;
+    ctx.fillStyle = "rgba(251,146,60,0.3)";
+    ctx.beginPath(); ctx.moveTo(0, H);
+    for (let x = 0; x <= W; x += 20) {
+      const wx = x + off1;
+      const y = horizon - 40 - Math.sin(wx * 0.01) * 50;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+    const off2 = cam * 0.35;
+    ctx.fillStyle = "rgba(244,63,94,0.35)";
+    ctx.beginPath(); ctx.moveTo(0, H);
+    for (let x = 0; x <= W; x += 20) {
+      const wx = x + off2;
+      const y = horizon + 5 - Math.sin(wx * 0.008 + 2) * 35;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "rgba(251,191,36,0.5)";
+    ctx.beginPath(); ctx.arc(W * 0.8, 120, 70, 0, Math.PI * 2); ctx.fill();
+  } else if (theme === "factory") {
+    const off = cam * 0.25;
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 140 - (off % 140);
+      const h = 110 + rand(i + 2) * 130;
+      ctx.fillStyle = "rgba(60,60,60,0.7)";
+      ctx.fillRect(sx, horizon - h, 100, h);
+      ctx.fillStyle = "rgba(250,204,21,0.6)";
+      for (let wy = horizon - h + 10; wy < horizon - 10; wy += 18) {
+        for (let wx = sx + 10; wx < sx + 90; wx += 20) {
+          if (rand(i * 60 + wy + wx) > 0.5) ctx.fillRect(wx, wy, 8, 8);
+        }
+      }
+    }
+    for (let i = 0; i < 40; i++) {
+      const sx = ((i * 131 - cam * 0.4) % W + W) % W;
+      const sy = (i * 53) % (H / 2);
+      ctx.fillStyle = `rgba(239,68,68,${0.3 + rand(i) * 0.5})`;
+      ctx.fillRect(sx, sy, 2, 2);
+    }
+  } else if (theme === "crystal") {
+    const off = cam * 0.2;
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 120 - (off % 120);
+      const h = 80 + rand(i + 6) * 100;
+      ctx.fillStyle = "rgba(34,211,238,0.35)";
+      ctx.beginPath();
+      ctx.moveTo(sx + 30, horizon);
+      ctx.lineTo(sx + 60, horizon - h);
+      ctx.lineTo(sx + 90, horizon);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = "rgba(167,139,250,0.4)"; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(sx + 30, horizon);
+      ctx.lineTo(sx + 60, horizon - h);
+      ctx.lineTo(sx + 90, horizon);
+      ctx.closePath(); ctx.stroke();
+    }
+  } else if (theme === "abyss") {
+    for (let i = 0; i < 180; i++) {
+      const sx = ((i * 149 - cam * 0.2) % W + W) % W;
+      const sy = (i * 83) % H;
+      const a = 0.2 + rand(i) * 0.8;
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.fillRect(sx, sy, rand(i + 1) > 0.9 ? 3 : 1, 1);
+    }
+    const off = cam * 0.4;
+    for (let i = -2; i < 20; i++) {
+      const sx = i * 250 - (off % 250);
+      ctx.fillStyle = "rgba(239,68,68,0.15)";
+      ctx.beginPath(); ctx.arc(sx, 100, 50, 0, Math.PI * 2); ctx.fill();
     }
   }
 }
