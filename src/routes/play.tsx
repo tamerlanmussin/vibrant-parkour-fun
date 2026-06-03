@@ -16,6 +16,8 @@ type LeaderRow = { username: string; best_score: number };
 type Profile = { username: string; best_score: number };
 type Platform = { x: number; y: number; w: number; h: number; kind: "ground" | "wall" };
 
+type Theme = "warmup" | "city" | "desert" | "jungle" | "neon" | "arctic" | "volcano" | "void";
+
 type Level = {
   id: number;
   name: string;
@@ -29,18 +31,20 @@ type Level = {
   bgBot: string;
   ground: string;
   wall: string;
+  theme: Theme;
 };
 
 const LEVELS: Level[] = [
-  { id: 1, name: "ТРАССА 01 · РАЗМИНКА",     target: 200,  gapMin: 80,  gapMax: 180, wallChance: 0.25, gravity: 0.55, speed: 6.5, bgTop: "#1a2129", bgBot: "#262e38", ground: "#1c69d4", wall: "#e22718" },
-  { id: 2, name: "ТРАССА 02 · ГОРОД",        target: 400,  gapMin: 100, gapMax: 200, wallChance: 0.40, gravity: 0.58, speed: 7.0, bgTop: "#0c1a2a", bgBot: "#1a3045", ground: "#00b3d4", wall: "#ff5a1f" },
-  { id: 3, name: "ТРАССА 03 · ПУСТЫНЯ",      target: 600,  gapMin: 110, gapMax: 220, wallChance: 0.45, gravity: 0.55, speed: 7.5, bgTop: "#3a1a05", bgBot: "#5a2d0a", ground: "#e8a35a", wall: "#c2410c" },
-  { id: 4, name: "ТРАССА 04 · ДЖУНГЛИ",      target: 850,  gapMin: 120, gapMax: 240, wallChance: 0.50, gravity: 0.62, speed: 7.8, bgTop: "#0a1f10", bgBot: "#143a1f", ground: "#22c55e", wall: "#fbbf24" },
-  { id: 5, name: "ТРАССА 05 · НОЧНОЙ НЕОН",  target: 1100, gapMin: 130, gapMax: 260, wallChance: 0.55, gravity: 0.60, speed: 8.2, bgTop: "#1a0535", bgBot: "#0a0420", ground: "#a855f7", wall: "#ec4899" },
-  { id: 6, name: "ТРАССА 06 · АРКТИКА",      target: 1400, gapMin: 140, gapMax: 280, wallChance: 0.55, gravity: 0.58, speed: 8.5, bgTop: "#0a2540", bgBot: "#1a4a6e", ground: "#bae6fd", wall: "#3b82f6" },
-  { id: 7, name: "ТРАССА 07 · ВУЛКАН",       target: 1800, gapMin: 150, gapMax: 300, wallChance: 0.60, gravity: 0.65, speed: 8.8, bgTop: "#1a0505", bgBot: "#3a0a0a", ground: "#f97316", wall: "#dc2626" },
-  { id: 8, name: "ТРАССА 08 · БЕСКОНЕЧНОСТЬ", target: 9999, gapMin: 160, gapMax: 320, wallChance: 0.55, gravity: 0.62, speed: 9.2, bgTop: "#000000", bgBot: "#1a1a1a", ground: "#ffffff", wall: "#facc15" },
+  { id: 1, name: "ТРАССА 01 · РАЗМИНКА",     target: 200,  gapMin: 80,  gapMax: 180, wallChance: 0.25, gravity: 0.55, speed: 6.5, bgTop: "#1a2129", bgBot: "#262e38", ground: "#1c69d4", wall: "#e22718", theme: "warmup" },
+  { id: 2, name: "ТРАССА 02 · ГОРОД",        target: 400,  gapMin: 100, gapMax: 200, wallChance: 0.40, gravity: 0.58, speed: 7.0, bgTop: "#0c1a2a", bgBot: "#1a3045", ground: "#00b3d4", wall: "#ff5a1f", theme: "city" },
+  { id: 3, name: "ТРАССА 03 · ПУСТЫНЯ",      target: 600,  gapMin: 110, gapMax: 220, wallChance: 0.45, gravity: 0.55, speed: 7.5, bgTop: "#3a1a05", bgBot: "#5a2d0a", ground: "#e8a35a", wall: "#c2410c", theme: "desert" },
+  { id: 4, name: "ТРАССА 04 · ДЖУНГЛИ",      target: 850,  gapMin: 120, gapMax: 240, wallChance: 0.50, gravity: 0.62, speed: 7.8, bgTop: "#0a1f10", bgBot: "#143a1f", ground: "#22c55e", wall: "#fbbf24", theme: "jungle" },
+  { id: 5, name: "ТРАССА 05 · НОЧНОЙ НЕОН",  target: 1100, gapMin: 130, gapMax: 260, wallChance: 0.55, gravity: 0.60, speed: 8.2, bgTop: "#1a0535", bgBot: "#0a0420", ground: "#a855f7", wall: "#ec4899", theme: "neon" },
+  { id: 6, name: "ТРАССА 06 · АРКТИКА",      target: 1400, gapMin: 140, gapMax: 280, wallChance: 0.55, gravity: 0.58, speed: 8.5, bgTop: "#0a2540", bgBot: "#1a4a6e", ground: "#bae6fd", wall: "#3b82f6", theme: "arctic" },
+  { id: 7, name: "ТРАССА 07 · ВУЛКАН",       target: 1800, gapMin: 150, gapMax: 300, wallChance: 0.60, gravity: 0.65, speed: 8.8, bgTop: "#1a0505", bgBot: "#3a0a0a", ground: "#f97316", wall: "#dc2626", theme: "volcano" },
+  { id: 8, name: "ТРАССА 08 · БЕСКОНЕЧНОСТЬ", target: 9999, gapMin: 160, gapMax: 320, wallChance: 0.55, gravity: 0.62, speed: 9.2, bgTop: "#000000", bgBot: "#1a1a1a", ground: "#ffffff", wall: "#facc15", theme: "void" },
 ];
+
 
 type Skin = { id: string; name: string; body: string; stroke: string };
 const SKINS: Skin[] = [
@@ -53,6 +57,163 @@ const SKINS: Skin[] = [
   { id: "magenta", name: "МАГЕНТА",  body: "#ec4899", stroke: "#831843" },
   { id: "lime",    name: "ЛАЙМ",     body: "#a3e635", stroke: "#365314" },
 ];
+
+// Hash-based pseudo-random for stable parallax scenery
+function rand(seed: number) {
+  const x = Math.sin(seed * 9301 + 49297) * 233280;
+  return x - Math.floor(x);
+}
+
+function drawBackdrop(ctx: CanvasRenderingContext2D, theme: Theme, cam: number, W: number, H: number) {
+  const horizon = H - 80;
+
+  if (theme === "city") {
+    const farOff = cam * 0.15;
+    ctx.fillStyle = "rgba(20,40,70,0.7)";
+    for (let i = -2; i < 40; i++) {
+      const sx = i * 90 - (farOff % 90);
+      const h = 80 + rand(i + 1) * 140;
+      ctx.fillRect(sx, horizon - h, 70, h);
+      ctx.fillStyle = "rgba(180,210,255,0.18)";
+      for (let wy = horizon - h + 8; wy < horizon - 8; wy += 14) {
+        for (let wx = sx + 6; wx < sx + 64; wx += 12) {
+          if (rand(i * 50 + wy + wx) > 0.5) ctx.fillRect(wx, wy, 4, 6);
+        }
+      }
+      ctx.fillStyle = "rgba(20,40,70,0.7)";
+    }
+    const nearOff = cam * 0.4;
+    ctx.fillStyle = "rgba(10,20,40,0.85)";
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 140 - (nearOff % 140);
+      const h = 140 + rand(i + 99) * 180;
+      ctx.fillRect(sx, horizon - h, 110, h);
+    }
+  } else if (theme === "desert") {
+    const off1 = cam * 0.2;
+    ctx.fillStyle = "rgba(140,80,30,0.5)";
+    ctx.beginPath(); ctx.moveTo(0, H);
+    for (let x = 0; x <= W; x += 20) {
+      const wx = x + off1;
+      const y = horizon - 30 - Math.sin(wx * 0.01) * 40 - Math.sin(wx * 0.004) * 60;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+    const off2 = cam * 0.4;
+    ctx.fillStyle = "rgba(90,45,15,0.7)";
+    ctx.beginPath(); ctx.moveTo(0, H);
+    for (let x = 0; x <= W; x += 20) {
+      const wx = x + off2;
+      const y = horizon + 10 - Math.sin(wx * 0.012 + 1) * 35;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "rgba(255,180,90,0.5)";
+    ctx.beginPath(); ctx.arc(W * 0.78, 110, 60, 0, Math.PI * 2); ctx.fill();
+  } else if (theme === "jungle") {
+    const off1 = cam * 0.2;
+    ctx.fillStyle = "rgba(10,40,20,0.7)";
+    for (let i = -2; i < 40; i++) {
+      const sx = i * 70 - (off1 % 70);
+      const r = 40 + rand(i + 3) * 30;
+      ctx.beginPath(); ctx.arc(sx, horizon - r * 0.4, r, 0, Math.PI * 2); ctx.fill();
+    }
+    const off2 = cam * 0.45;
+    ctx.fillStyle = "rgba(5,25,12,0.9)";
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 100 - (off2 % 100);
+      const r = 60 + rand(i + 77) * 40;
+      ctx.beginPath(); ctx.arc(sx, horizon - r * 0.3 + 20, r, 0, Math.PI * 2); ctx.fill();
+    }
+  } else if (theme === "neon") {
+    const off = cam * 0.2;
+    ctx.strokeStyle = "rgba(236,72,153,0.35)"; ctx.lineWidth = 1;
+    for (let i = 0; i < 14; i++) {
+      const y = horizon + i * i * 1.6;
+      if (y > H) break;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+    for (let i = -10; i <= 10; i++) {
+      ctx.beginPath();
+      const vx = W / 2 + i * 30;
+      ctx.moveTo(vx - (off % 30), horizon);
+      ctx.lineTo(W / 2 + i * 200, H);
+      ctx.stroke();
+    }
+    const tOff = cam * 0.3;
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 120 - (tOff % 120);
+      const h = 100 + rand(i + 5) * 160;
+      ctx.fillStyle = "rgba(168,85,247,0.5)";
+      ctx.fillRect(sx, horizon - h, 50, h);
+      ctx.fillStyle = "rgba(34,230,255,0.6)";
+      ctx.fillRect(sx + 22, horizon - h - 12, 6, 12);
+    }
+  } else if (theme === "arctic") {
+    const off1 = cam * 0.15;
+    ctx.fillStyle = "rgba(200,220,240,0.4)";
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 200 - (off1 % 200);
+      ctx.beginPath();
+      ctx.moveTo(sx, horizon);
+      ctx.lineTo(sx + 100, horizon - 160 - rand(i + 9) * 40);
+      ctx.lineTo(sx + 200, horizon);
+      ctx.closePath(); ctx.fill();
+    }
+    const off2 = cam * 0.35;
+    ctx.fillStyle = "rgba(150,180,210,0.6)";
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 140 - (off2 % 140);
+      ctx.beginPath();
+      ctx.moveTo(sx, horizon);
+      ctx.lineTo(sx + 70, horizon - 110 - rand(i + 22) * 30);
+      ctx.lineTo(sx + 140, horizon);
+      ctx.closePath(); ctx.fill();
+    }
+    for (let i = 0; i < 60; i++) {
+      const sx = ((i * 73 - cam * 0.6) % W + W) % W;
+      const sy = (i * 37) % H;
+      ctx.fillStyle = "rgba(255,255,255,0.6)";
+      ctx.fillRect(sx, sy, 2, 2);
+    }
+  } else if (theme === "volcano") {
+    const off1 = cam * 0.18;
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 180 - (off1 % 180);
+      const peak = horizon - 180 - rand(i + 11) * 50;
+      ctx.fillStyle = "rgba(60,10,5,0.85)";
+      ctx.beginPath();
+      ctx.moveTo(sx, horizon);
+      ctx.lineTo(sx + 90, peak);
+      ctx.lineTo(sx + 180, horizon);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "rgba(249,115,22,0.7)";
+      ctx.fillRect(sx + 85, peak + 30, 10, 60);
+    }
+    for (let i = 0; i < 40; i++) {
+      const sx = ((i * 91 - cam * 0.5) % W + W) % W;
+      const sy = (i * 53) % H;
+      ctx.fillStyle = `rgba(255,${100 + (i % 80)},20,0.7)`;
+      ctx.fillRect(sx, sy, 2, 2);
+    }
+  } else if (theme === "warmup") {
+    const off = cam * 0.2;
+    ctx.fillStyle = "rgba(28,105,212,0.18)";
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 110 - (off % 110);
+      const h = 90 + rand(i + 13) * 120;
+      ctx.fillRect(sx, horizon - h, 90, h);
+    }
+  } else if (theme === "void") {
+    for (let i = 0; i < 120; i++) {
+      const sx = ((i * 137 - cam * 0.3) % W + W) % W;
+      const sy = (i * 71) % H;
+      const a = 0.3 + rand(i) * 0.7;
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.fillRect(sx, sy, rand(i + 1) > 0.85 ? 2 : 1, 1);
+    }
+  }
+}
 
 function Game() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -264,10 +425,15 @@ function Game() {
       g.addColorStop(0, L.bgTop); g.addColorStop(1, L.bgBot);
       ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
 
-      ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 1;
-      const off = (cameraX * 0.3) % 60;
-      for (let x = -off; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
-      for (let y = 0; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+      drawBackdrop(ctx, L.theme, cameraX, W, H);
+
+      if (L.theme === "warmup" || L.theme === "void") {
+        ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 1;
+        const off = (cameraX * 0.3) % 60;
+        for (let x = -off; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+        for (let y = 0; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+      }
+
 
       ctx.save();
       ctx.translate(-cameraX, 0);
