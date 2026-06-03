@@ -35,14 +35,24 @@ type Level = {
 };
 
 const LEVELS: Level[] = [
-  { id: 1, name: "ТРАССА 01 · РАЗМИНКА",     target: 200,  gapMin: 80,  gapMax: 180, wallChance: 0.25, gravity: 0.40, speed: 4.5, bgTop: "#1a2129", bgBot: "#262e38", ground: "#1c69d4", wall: "#e22718", theme: "warmup" },
-  { id: 2, name: "ТРАССА 02 · ГОРОД",        target: 400,  gapMin: 100, gapMax: 200, wallChance: 0.40, gravity: 0.42, speed: 5.0, bgTop: "#0c1a2a", bgBot: "#1a3045", ground: "#00b3d4", wall: "#ff5a1f", theme: "city" },
-  { id: 3, name: "ТРАССА 03 · ПУСТЫНЯ",      target: 600,  gapMin: 110, gapMax: 220, wallChance: 0.45, gravity: 0.40, speed: 5.5, bgTop: "#3a1a05", bgBot: "#5a2d0a", ground: "#e8a35a", wall: "#c2410c", theme: "desert" },
-  { id: 4, name: "ТРАССА 04 · ДЖУНГЛИ",      target: 850,  gapMin: 120, gapMax: 240, wallChance: 0.50, gravity: 0.46, speed: 5.8, bgTop: "#0a1f10", bgBot: "#143a1f", ground: "#22c55e", wall: "#fbbf24", theme: "jungle" },
-  { id: 5, name: "ТРАССА 05 · НОЧНОЙ НЕОН",  target: 1100, gapMin: 130, gapMax: 260, wallChance: 0.55, gravity: 0.44, speed: 6.0, bgTop: "#1a0535", bgBot: "#0a0420", ground: "#a855f7", wall: "#ec4899", theme: "neon" },
-  { id: 6, name: "ТРАССА 06 · АРКТИКА",      target: 1400, gapMin: 140, gapMax: 280, wallChance: 0.55, gravity: 0.42, speed: 6.2, bgTop: "#0a2540", bgBot: "#1a4a6e", ground: "#bae6fd", wall: "#3b82f6", theme: "arctic" },
-  { id: 7, name: "ТРАССА 07 · ВУЛКАН",       target: 1800, gapMin: 150, gapMax: 300, wallChance: 0.60, gravity: 0.48, speed: 6.5, bgTop: "#1a0505", bgBot: "#3a0a0a", ground: "#f97316", wall: "#dc2626", theme: "volcano" },
-  { id: 8, name: "ТРАССА 08 · БЕСКОНЕЧНОСТЬ", target: 9999, gapMin: 160, gapMax: 320, wallChance: 0.55, gravity: 0.46, speed: 6.8, bgTop: "#000000", bgBot: "#1a1a1a", ground: "#ffffff", wall: "#facc15", theme: "void" },
+  { id: 1, name: "ТРАССА 01 · РАЗМИНКА", target: 200, gapMin: 80, gapMax: 180, wallChance: 0.25, gravity: 0.40, speed: 4.5, bgTop: "#1a2129", bgBot: "#262e38", ground: "#1c69d4", wall: "#e22718", theme: "warmup" },
+  { id: 2, name: "ТРАССА 02 · ГОРОД", target: 400, gapMin: 100, gapMax: 200, wallChance: 0.40, gravity: 0.42, speed: 5.0, bgTop: "#0c1a2a", bgBot: "#1a3045", ground: "#00b3d4", wall: "#ff5a1f", theme: "city" },
+  { id: 3, name: "ТРАССА 03 · ПУСТЫНЯ", target: 600, gapMin: 110, gapMax: 220, wallChance: 0.45, gravity: 0.40, speed: 5.5, bgTop: "#3a1a05", bgBot: "#5a2d0a", ground: "#e8a35a", wall: "#c2410c", theme: "desert" },
+  { id: 4, name: "ТРАССА 04 · ДЖУНГЛИ", target: 850, gapMin: 120, gapMax: 240, wallChance: 0.50, gravity: 0.46, speed: 5.8, bgTop: "#0a1f10", bgBot: "#143a1f", ground: "#22c55e", wall: "#fbbf24", theme: "jungle" },
+  { id: 5, name: "ТРАССА 05 · НОЧНОЙ НЕОН", target: 1100, gapMin: 130, gapMax: 260, wallChance: 0.55, gravity: 0.44, speed: 6.0, bgTop: "#1a0535", bgBot: "#0a0420", ground: "#a855f7", wall: "#ec4899", theme: "neon" },
+  { id: 6, name: "ТРАССА 06 · АРКТИКА", target: 1400, gapMin: 140, gapMax: 280, wallChance: 0.55, gravity: 0.42, speed: 6.2, bgTop: "#0a2540", bgBot: "#1a4a6e", ground: "#bae6fd", wall: "#3b82f6", theme: "arctic" },
+  { id: 7, name: "ТРАССА 07 · ВУЛКАН", target: 1800, gapMin: 150, gapMax: 300, wallChance: 0.60, gravity: 0.48, speed: 6.5, bgTop: "#1a0505", bgBot: "#3a0a0a", ground: "#f97316", wall: "#dc2626", theme: "volcano" },
+  { id: 8, name: "ТРАССА 08 · ПУСТОТА", target: 2400, gapMin: 160, gapMax: 320, wallChance: 0.60, gravity: 0.46, speed: 7.0, bgTop: "#000000", bgBot: "#1a1a1a", ground: "#ffffff", wall: "#facc15", theme: "void" },
+  { id: 9, name: "ТРАССА 09 · КИБЕРПАНК", target: 2800, gapMin: 170, gapMax: 340, wallChance: 0.62, gravity: 0.46, speed: 7.2, bgTop: "#0a0a1a", bgBot: "#1a1a3a", ground: "#f472b6", wall: "#22d3ee", theme: "cyber" },
+  { id: 10, name: "ТРАССА 10 · КОСМОС", target: 3200, gapMin: 180, gapMax: 360, wallChance: 0.62, gravity: 0.47, speed: 7.4, bgTop: "#050510", bgBot: "#0a0a20", ground: "#a78bfa", wall: "#34d399", theme: "space" },
+  { id: 11, name: "ТРАССА 11 · БОЛОТО", target: 3700, gapMin: 190, gapMax: 380, wallChance: 0.65, gravity: 0.47, speed: 7.6, bgTop: "#0a1a0a", bgBot: "#142814", ground: "#65a30d", wall: "#3f6212", theme: "swamp" },
+  { id: 12, name: "ТРАССА 12 · КОНФЕТЫ", target: 4200, gapMin: 200, gapMax: 400, wallChance: 0.65, gravity: 0.48, speed: 7.8, bgTop: "#2a0a2a", bgBot: "#3a153a", ground: "#f9a8d4", wall: "#c084fc", theme: "candy" },
+  { id: 13, name: "ТРАССА 13 · КЛАДБИЩЕ", target: 4800, gapMin: 210, gapMax: 420, wallChance: 0.68, gravity: 0.48, speed: 8.0, bgTop: "#0a0a0a", bgBot: "#111111", ground: "#4b5563", wall: "#10b981", theme: "graveyard" },
+  { id: 14, name: "ТРАССА 14 · ПОДВОДНЫЙ", target: 5400, gapMin: 220, gapMax: 440, wallChance: 0.68, gravity: 0.49, speed: 8.2, bgTop: "#001a33", bgBot: "#002a4d", ground: "#22d3ee", wall: "#0ea5e9", theme: "underwater" },
+  { id: 15, name: "ТРАССА 15 · ЗАКАТ", target: 6000, gapMin: 230, gapMax: 460, wallChance: 0.70, gravity: 0.49, speed: 8.4, bgTop: "#2a0a05", bgBot: "#4a1a0a", ground: "#fb923c", wall: "#f43f5e", theme: "sunset" },
+  { id: 16, name: "ТРАССА 16 · ФАБРИКА", target: 6700, gapMin: 240, gapMax: 480, wallChance: 0.70, gravity: 0.50, speed: 8.6, bgTop: "#1a1a1a", bgBot: "#262626", ground: "#facc15", wall: "#ef4444", theme: "factory" },
+  { id: 17, name: "ТРАССА 17 · КРИСТАЛЛЫ", target: 7500, gapMin: 250, gapMax: 500, wallChance: 0.72, gravity: 0.50, speed: 8.8, bgTop: "#0a0a1a", bgBot: "#1a1a2e", ground: "#22d3ee", wall: "#a78bfa", theme: "crystal" },
+  { id: 18, name: "ТРАССА 18 · БЕСКОНЕЧНОСТЬ", target: 9999, gapMin: 260, gapMax: 520, wallChance: 0.72, gravity: 0.50, speed: 9.0, bgTop: "#000000", bgBot: "#050505", ground: "#ffffff", wall: "#ef4444", theme: "abyss" },
 ];
 
 
