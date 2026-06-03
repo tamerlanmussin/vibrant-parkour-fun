@@ -48,19 +48,56 @@ const LEVELS: Level[] = [
 
 type Shape = "square" | "circle" | "triangle" | "diamond" | "hexagon" | "star" | "pill" | "cross" | "ring" | "heart" | "quad";
 type Skin = { id: string; name: string; body: string; stroke: string; shape: Shape };
-const SKINS: Skin[] = [
-  { id: "white",   name: "КУБ",       body: "#ffffff", stroke: "#262626", shape: "square" },
-  { id: "blue",    name: "КРУГ",      body: "#1c69d4", stroke: "#0653b6", shape: "circle" },
-  { id: "red",     name: "ТРЕУГОЛ.",  body: "#e22718", stroke: "#7f1d1d", shape: "triangle" },
-  { id: "neon",    name: "РОМБ",      body: "#22e6ff", stroke: "#0e7490", shape: "diamond" },
-  { id: "gold",    name: "ГЕКСАГОН",  body: "#fbbf24", stroke: "#78350f", shape: "hexagon" },
-  { id: "ghost",   name: "ЗВЕЗДА",    body: "#94a3b8", stroke: "#ffffff", shape: "star" },
-  { id: "magenta", name: "ПИЛЮЛЯ",    body: "#ec4899", stroke: "#831843", shape: "pill" },
-  { id: "lime",    name: "КРЕСТ",     body: "#a3e635", stroke: "#365314", shape: "cross" },
-  { id: "violet",  name: "КОЛЬЦО",    body: "#a855f7", stroke: "#3b0764", shape: "ring" },
-  { id: "rose",    name: "СЕРДЦЕ",    body: "#fb7185", stroke: "#881337", shape: "heart" },
-  { id: "quad",    name: "4-В-1",     body: "#f59e0b", stroke: "#1f2937", shape: "quad" },
+const PALETTE: { name: string; body: string; stroke: string }[] = [
+  { name: "БЕЛЫЙ",      body: "#ffffff", stroke: "#262626" },
+  { name: "СИНИЙ",      body: "#1c69d4", stroke: "#0653b6" },
+  { name: "КРАСНЫЙ",    body: "#e22718", stroke: "#7f1d1d" },
+  { name: "НЕОН",       body: "#22e6ff", stroke: "#0e7490" },
+  { name: "ЗОЛОТО",     body: "#fbbf24", stroke: "#78350f" },
+  { name: "СЕРЫЙ",      body: "#94a3b8", stroke: "#1f2937" },
+  { name: "РОЗОВЫЙ",    body: "#ec4899", stroke: "#831843" },
+  { name: "ЛАЙМ",       body: "#a3e635", stroke: "#365314" },
+  { name: "ФИОЛЕТ.",    body: "#a855f7", stroke: "#3b0764" },
+  { name: "КОРАЛЛ",     body: "#fb7185", stroke: "#881337" },
+  { name: "ОРАНЖ.",     body: "#f97316", stroke: "#7c2d12" },
+  { name: "БИРЮЗА",     body: "#14b8a6", stroke: "#134e4a" },
+  { name: "ИЗУМРУД",    body: "#10b981", stroke: "#064e3b" },
+  { name: "ИНДИГО",     body: "#6366f1", stroke: "#312e81" },
+  { name: "НЕБО",       body: "#38bdf8", stroke: "#075985" },
+  { name: "МЯТА",       body: "#5eead4", stroke: "#115e59" },
+  { name: "ЯНТАРЬ",     body: "#f59e0b", stroke: "#78350f" },
+  { name: "СЛИВА",      body: "#7e22ce", stroke: "#3b0764" },
+  { name: "ВИШНЯ",      body: "#dc2626", stroke: "#450a0a" },
+  { name: "ОЛИВА",      body: "#84cc16", stroke: "#3f6212" },
+  { name: "САКУРА",     body: "#f9a8d4", stroke: "#9d174d" },
+  { name: "УГОЛЬ",      body: "#27272a", stroke: "#ffffff" },
+  { name: "ПЕСОК",      body: "#fde68a", stroke: "#92400e" },
+  { name: "МОРЕ",       body: "#0ea5e9", stroke: "#0c4a6e" },
 ];
+
+const SHAPES: { id: Shape; name: string }[] = [
+  { id: "square",   name: "КУБ" },
+  { id: "circle",   name: "КРУГ" },
+  { id: "triangle", name: "ТРЕУГ." },
+  { id: "diamond",  name: "РОМБ" },
+  { id: "hexagon",  name: "ГЕКС." },
+  { id: "star",     name: "ЗВЕЗДА" },
+  { id: "pill",     name: "ПИЛЮЛЯ" },
+  { id: "cross",    name: "КРЕСТ" },
+  { id: "ring",     name: "КОЛЬЦО" },
+  { id: "heart",    name: "СЕРДЦЕ" },
+  { id: "quad",     name: "4-В-1" },
+];
+
+const SKINS: Skin[] = SHAPES.flatMap((sh) =>
+  PALETTE.map((c) => ({
+    id: `${sh.id}-${c.name}`,
+    name: `${sh.name} · ${c.name}`,
+    body: c.body,
+    stroke: c.stroke,
+    shape: sh.id,
+  }))
+);
 
 
 function drawShape(ctx: CanvasRenderingContext2D, shape: Shape, x: number, y: number, w: number, h: number, body: string, stroke: string) {
