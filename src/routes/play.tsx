@@ -1258,6 +1258,108 @@ function Game() {
           </div>
         </div>
       )}
+
+      {editorOpen && editorDraft && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.85)" }} onClick={() => setEditorOpen(false)}>
+          <div className="max-w-xl w-full p-6 font-mono max-h-[90vh] overflow-y-auto" style={{ background: "#1a2129", border: "2px solid #22e6ff" }} onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-black" style={{ color: "#22e6ff" }}>РЕДАКТОР УРОВНЯ</h2>
+              <button onClick={() => setEditorOpen(false)} className="text-xl px-2" style={{ color: "#6b6b6b" }}>✕</button>
+            </div>
+
+            <div className="flex flex-col gap-3 text-xs" style={{ color: "#e6e6e6" }}>
+              <label className="flex flex-col gap-1">
+                <span style={{ color: "#22e6ff" }}>НАЗВАНИЕ</span>
+                <input
+                  value={editorDraft.name}
+                  onChange={(e) => setEditorDraft({ ...editorDraft, name: e.target.value })}
+                  className="px-2 py-1 bg-black/40 border" style={{ borderColor: "#3a4250", color: "#fff" }}
+                />
+              </label>
+
+              <div className="grid grid-cols-2 gap-3">
+                <label className="flex flex-col gap-1">
+                  <span style={{ color: "#22e6ff" }}>ЦЕЛЬ (дистанция): {editorDraft.target}</span>
+                  <input type="range" min={100} max={9999} step={50}
+                    value={editorDraft.target}
+                    onChange={(e) => setEditorDraft({ ...editorDraft, target: Number(e.target.value) })} />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span style={{ color: "#22e6ff" }}>СКОРОСТЬ: {editorDraft.speed.toFixed(1)}</span>
+                  <input type="range" min={3} max={10} step={0.1}
+                    value={editorDraft.speed}
+                    onChange={(e) => setEditorDraft({ ...editorDraft, speed: Number(e.target.value) })} />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span style={{ color: "#22e6ff" }}>ГРАВИТАЦИЯ: {editorDraft.gravity.toFixed(2)}</span>
+                  <input type="range" min={0.3} max={0.7} step={0.01}
+                    value={editorDraft.gravity}
+                    onChange={(e) => setEditorDraft({ ...editorDraft, gravity: Number(e.target.value) })} />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span style={{ color: "#22e6ff" }}>ШАНС СТЕН: {Math.round(editorDraft.wallChance * 100)}%</span>
+                  <input type="range" min={0} max={1} step={0.05}
+                    value={editorDraft.wallChance}
+                    onChange={(e) => setEditorDraft({ ...editorDraft, wallChance: Number(e.target.value) })} />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span style={{ color: "#22e6ff" }}>МИН. РАЗРЫВ: {editorDraft.gapMin}</span>
+                  <input type="range" min={60} max={400} step={10}
+                    value={editorDraft.gapMin}
+                    onChange={(e) => setEditorDraft({ ...editorDraft, gapMin: Number(e.target.value) })} />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span style={{ color: "#22e6ff" }}>МАКС. РАЗРЫВ: {editorDraft.gapMax}</span>
+                  <input type="range" min={80} max={600} step={10}
+                    value={editorDraft.gapMax}
+                    onChange={(e) => setEditorDraft({ ...editorDraft, gapMax: Number(e.target.value) })} />
+                </label>
+              </div>
+
+              <label className="flex flex-col gap-1">
+                <span style={{ color: "#22e6ff" }}>ТЕМА ФОНА</span>
+                <select
+                  value={editorDraft.theme}
+                  onChange={(e) => setEditorDraft({ ...editorDraft, theme: e.target.value as Theme })}
+                  className="px-2 py-1 bg-black/40 border" style={{ borderColor: "#3a4250", color: "#fff" }}
+                >
+                  {(["warmup","city","desert","jungle","neon","arctic","volcano","void","cyber","space","swamp","candy","graveyard","underwater","sunset","factory","crystal","abyss","aurora","omega"] as Theme[]).map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </label>
+
+              <div className="grid grid-cols-4 gap-2">
+                {([["bgTop","ФОН ВЕРХ"],["bgBot","ФОН НИЗ"],["ground","ПЛАТФОРМЫ"],["wall","СТЕНЫ"]] as const).map(([k, label]) => (
+                  <label key={k} className="flex flex-col gap-1 items-center">
+                    <span className="text-[10px]" style={{ color: "#22e6ff" }}>{label}</span>
+                    <input
+                      type="color"
+                      value={(editorDraft as any)[k]}
+                      onChange={(e) => setEditorDraft({ ...editorDraft, [k]: e.target.value } as Level)}
+                      className="w-12 h-10 bg-transparent border cursor-pointer"
+                      style={{ borderColor: "#3a4250" }}
+                    />
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-2 mt-5">
+              <button
+                onClick={() => setEditorOpen(false)}
+                className="flex-1 py-2 font-bold text-xs tracking-wider uppercase border"
+                style={{ borderColor: "#6b6b6b", color: "#6b6b6b" }}
+              >ОТМЕНА</button>
+              <button
+                onClick={saveEditor}
+                className="flex-1 py-2 font-bold text-xs tracking-wider uppercase"
+                style={{ background: "#22e6ff", color: "#0a0a0a" }}
+              >СОХРАНИТЬ И ИГРАТЬ</button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
