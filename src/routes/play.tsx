@@ -559,6 +559,47 @@ function drawBackdrop(ctx: CanvasRenderingContext2D, theme: Theme, cam: number, 
       ctx.fillStyle = "rgba(239,68,68,0.15)";
       ctx.beginPath(); ctx.arc(sx, 100, 50, 0, Math.PI * 2); ctx.fill();
     }
+  } else if (theme === "aurora") {
+    const off = cam * 0.1;
+    for (let i = 0; i < 5; i++) {
+      const waveY = 60 + i * 35;
+      ctx.strokeStyle = `rgba(${52 + i * 20},${211 - i * 15},${167 + i * 10},0.35)`;
+      ctx.lineWidth = 3 + i;
+      ctx.beginPath(); ctx.moveTo(0, waveY);
+      for (let x = 0; x <= W; x += 10) {
+        const wx = x + off + i * 50;
+        const y = waveY + Math.sin(wx * 0.005 + i) * 20 + Math.sin(wx * 0.01 + i * 2) * 10;
+        ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    for (let i = 0; i < 100; i++) {
+      const sx = ((i * 131 - cam * 0.15) % W + W) % W;
+      const sy = (i * 79) % (H / 2);
+      const a = 0.3 + rand(i) * 0.5;
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.fillRect(sx, sy, 1, 1);
+    }
+  } else if (theme === "omega") {
+    for (let i = 0; i < 200; i++) {
+      const sx = ((i * 157 - cam * 0.25) % W + W) % W;
+      const sy = (i * 89) % H;
+      const a = 0.15 + rand(i) * 0.85;
+      ctx.fillStyle = `rgba(255,${200 + rand(i + 1) * 55},${rand(i + 2) * 100},${a})`;
+      ctx.fillRect(sx, sy, rand(i + 3) > 0.9 ? 3 : 1, 1);
+    }
+    const off = cam * 0.3;
+    for (let i = -2; i < 20; i++) {
+      const sx = i * 300 - (off % 300);
+      ctx.fillStyle = "rgba(251,191,36,0.12)";
+      ctx.beginPath(); ctx.arc(sx, 80, 80, 0, Math.PI * 2); ctx.fill();
+    }
+    for (let i = 0; i < 30; i++) {
+      const sx = ((i * 167 - cam * 0.5) % W + W) % W;
+      const sy = (i * 61) % H;
+      ctx.fillStyle = `rgba(239,68,68,${0.2 + rand(i) * 0.4})`;
+      ctx.fillRect(sx, sy, 2, 2);
+    }
   }
 }
 
