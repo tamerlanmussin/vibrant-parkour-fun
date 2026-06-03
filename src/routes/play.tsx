@@ -394,9 +394,14 @@ function Game() {
   const [submitting, setSubmitting] = useState(false);
   const [showRules, setShowRules] = useState(false);
 
+  const DEFAULT_OWNED = useMemo(
+    () => SKINS.filter((s) => s.shape === "square" && ["БЕЛЫЙ", "СИНИЙ", "КРАСНЫЙ"].some((n) => s.name.endsWith(n))).map((s) => s.id),
+    []
+  );
+
   const [skinId, setSkinId] = useState<string>(() => {
-    if (typeof window === "undefined") return "white";
-    return localStorage.getItem("np_skin") ?? "white";
+    if (typeof window === "undefined") return SKINS[0].id;
+    return localStorage.getItem("np_skin") ?? SKINS[0].id;
   });
   const [levelId, setLevelId] = useState<number>(() => {
     if (typeof window === "undefined") return 1;
@@ -406,6 +411,25 @@ function Game() {
     if (typeof window === "undefined") return 1;
     return Number(localStorage.getItem("np_unlocked") ?? 1);
   });
+  const [owned, setOwned] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = localStorage.getItem("np_owned");
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return [];
+  });
+  const [lastClaim, setLastClaim] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem("np_last_claim") ?? "";
+  });
+  const [giftPopup, setGiftPopup] = useState<Skin[] | null>(null);
+
+  // Seed defaults on first mount if owned is empty
+  useEffect(() => {
+    if (owned.length === 0) setOwned(DEFAULT_OWNED);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const level = useMemo(() => LEVELS.find((l) => l.id === levelId) ?? LEVELS[0], [levelId]);
   const skin = useMemo(() => SKINS.find((s) => s.id === skinId) ?? SKINS[0], [skinId]);
@@ -420,6 +444,30 @@ function Game() {
   useEffect(() => { localStorage.setItem("np_skin", skinId); }, [skinId]);
   useEffect(() => { localStorage.setItem("np_level", String(levelId)); }, [levelId]);
   useEffect(() => { localStorage.setItem("np_unlocked", String(unlocked)); }, [unlocked]);
+  useEffect(() => { localStorage.setItem("np_owned", JSON.stringify(owned)); }, [owned]);
+  useEffect(() => { localStorage.setItem("np_last_claim", lastClaim); }, [lastClaim]);
+
+  const today = new Date().toISOString().slice(0, 10);
+  const canClaim = lastClaim !== today;
+
+  function claimDaily() {
+    if (!canClaim) return;
+    const locked = SKINS.filter((s) => !owned.includes(s.id));
+    if (locked.length === 0) {
+      setLastClaim(today);
+      return;
+    }
+    const count = Math.min(3, locked.length);
+    const picked: Skin[] = [];
+    const pool = [...locked];
+    for (let i = 0; i < count; i++) {
+      const idx = Math.floor(Math.random() * pool.length);
+      picked.push(pool.splice(idx, 1)[0]);
+    }
+    setOwned([...owned, ...picked.map((s) => s.id)]);
+    setLastClaim(today);
+    setGiftPopup(picked);
+  }
 
   async function loadLeaders() {
     const { data } = await supabase
