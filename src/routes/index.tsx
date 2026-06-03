@@ -238,15 +238,15 @@ function Game() {
     }
 
     function draw() {
-      // bg gradient
+      // BMW dark hero band gradient
       const g = ctx.createLinearGradient(0, 0, 0, H);
-      g.addColorStop(0, "#0a0420");
-      g.addColorStop(1, "#1a0535");
+      g.addColorStop(0, "#1a2129");
+      g.addColorStop(1, "#262e38");
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, W, H);
 
-      // parallax grid
-      ctx.strokeStyle = "rgba(180,80,255,0.12)";
+      // precise engineering grid — hairline on dark
+      ctx.strokeStyle = "rgba(230,230,230,0.06)";
       ctx.lineWidth = 1;
       const off = (cameraX * 0.3) % 60;
       for (let x = -off; x < W; x += 60) {
@@ -266,22 +266,22 @@ function Game() {
       ctx.translate(-cameraX, 0);
 
       for (const p of platforms) {
-        const color = p.kind === "wall" ? "#ff2bd6" : "#22e6ff";
+        // BMW Blue for platforms, M-red for walls. 0px radius, no glow — engineered precision.
+        const color = p.kind === "wall" ? "#e22718" : "#1c69d4";
         ctx.fillStyle = color;
-        ctx.shadowColor = color;
-        ctx.shadowBlur = 18;
         ctx.fillRect(p.x, p.y, p.w, p.h);
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = "rgba(255,255,255,0.15)";
-        ctx.fillRect(p.x, p.y, p.w, 3);
+        // 1px hairline highlight on top edge
+        ctx.fillStyle = "rgba(255,255,255,0.18)";
+        ctx.fillRect(p.x, p.y, p.w, 1);
       }
 
-      // player
-      ctx.fillStyle = "#fffb00";
-      ctx.shadowColor = "#fffb00";
-      ctx.shadowBlur = 22;
+      // player — white canvas block with ink outline
+      ctx.fillStyle = "#ffffff";
       ctx.fillRect(player.x, player.y, player.w, player.h);
-      ctx.shadowBlur = 0;
+      ctx.strokeStyle = "#262626";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(player.x + 0.5, player.y + 0.5, player.w - 1, player.h - 1);
+
 
       ctx.restore();
     }
