@@ -878,6 +878,41 @@ function Game() {
           </aside>
         </div>
       </div>
+
+      {giftPopup && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(0,0,0,0.85)" }}
+          onClick={() => setGiftPopup(null)}
+        >
+          <div
+            className="p-6 font-mono max-w-md w-full text-center"
+            style={{ background: "#1a2129", border: "2px solid #facc15" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-4xl mb-3">🎁</div>
+            <h3 className="text-2xl font-black mb-1" style={{ color: "#facc15" }}>ПОДАРОК ДНЯ!</h3>
+            <p className="text-xs mb-5" style={{ color: "#a3a3a3" }}>Ты получил {giftPopup.length} новых скина:</p>
+            <div className="flex justify-center gap-4 mb-5">
+              {giftPopup.map((s) => (
+                <div key={s.id} className="flex flex-col items-center gap-2">
+                  <div className="w-16 h-16 flex items-center justify-center border-2" style={{ background: "rgba(0,0,0,0.3)", borderColor: "#facc15" }}>
+                    <ShapeSwatch shape={s.shape} body={s.body} stroke={s.stroke} />
+                  </div>
+                  <div className="text-[10px]" style={{ color: s.body }}>{s.name}</div>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setGiftPopup(null)}
+              className="px-6 py-2 font-bold text-sm tracking-wider uppercase"
+              style={{ background: "#facc15", color: "#0a0a0a" }}
+            >
+              КРУТО!
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
