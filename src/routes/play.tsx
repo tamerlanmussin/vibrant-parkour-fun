@@ -646,6 +646,19 @@ function Game() {
     return localStorage.getItem("np_last_claim") ?? "";
   });
   const [giftPopup, setGiftPopup] = useState<Skin[] | null>(null);
+  const [customLevels, setCustomLevels] = useState<Level[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = localStorage.getItem("np_custom_levels");
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return [];
+  });
+  const [levelTab, setLevelTab] = useState<"std" | "custom">("std");
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editorDraft, setEditorDraft] = useState<Level | null>(null);
+
+  useEffect(() => { localStorage.setItem("np_custom_levels", JSON.stringify(customLevels)); }, [customLevels]);
 
   // Seed defaults on first mount if owned is empty
   useEffect(() => {
@@ -653,7 +666,8 @@ function Game() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const level = useMemo(() => LEVELS.find((l) => l.id === levelId) ?? LEVELS[0], [levelId]);
+  const ALL_LEVELS = useMemo(() => [...LEVELS, ...customLevels], [customLevels]);
+  const level = useMemo(() => ALL_LEVELS.find((l) => l.id === levelId) ?? LEVELS[0], [ALL_LEVELS, levelId]);
   const skin = useMemo(() => SKINS.find((s) => s.id === skinId) ?? SKINS[0], [skinId]);
 
   const levelRef = useRef(level);
@@ -739,12 +753,52 @@ function Game() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dead, won, score]);
 
-  // unlock next level on win
+  // unlock next level on win (only for standard levels)
   useEffect(() => {
-    if (won && level.id < LEVELS.length && level.id >= unlocked) {
+    if (won && level.id < 1000 && level.id < LEVELS.length && level.id >= unlocked) {
       setUnlocked(level.id + 1);
     }
   }, [won, level.id, unlocked]);
+
+  function openCreateEditor() {
+    const nextId = 1000 + customLevels.length + 1;
+    setEditorDraft({
+      id: nextId,
+      name: `МОЙ УРОВЕНЬ ${customLevels.length + 1}`,
+      target: 500,
+      gapMin: 120,
+      gapMax: 240,
+      wallChance: 0.5,
+      gravity: 0.44,
+      speed: 5.5,
+      bgTop: "#1a2129",
+      bgBot: "#262e38",
+      ground: "#22e6ff",
+      wall: "#ec4899",
+      theme: "neon",
+    });
+    setEditorOpen(true);
+  }
+  function openEditEditor(l: Level) {
+    setEditorDraft({ ...l });
+    setEditorOpen(true);
+  }
+  function saveEditor() {
+    if (!editorDraft) return;
+    const exists = customLevels.find((l) => l.id === editorDraft.id);
+    if (exists) {
+      setCustomLevels(customLevels.map((l) => l.id === editorDraft.id ? editorDraft : l));
+    } else {
+      setCustomLevels([...customLevels, editorDraft]);
+    }
+    setLevelId(editorDraft.id);
+    setEditorOpen(false);
+    setEditorDraft(null);
+  }
+  function deleteCustom(id: number) {
+    setCustomLevels(customLevels.filter((l) => l.id !== id));
+    if (levelId === id) setLevelId(1);
+  }
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -967,32 +1021,102 @@ function Game() {
       <div className="flex flex-col lg:flex-row gap-4 items-start justify-center w-full max-w-6xl">
         {/* Left: levels */}
         <aside className="w-full lg:w-56 p-4 font-mono" style={{ background: "rgba(26,33,41,0.7)", border: "1px solid #1c69d4" }}>
-          <h2 className="text-sm font-black mb-3 tracking-wider" style={{ color: "#1c69d4" }}>УРОВНИ</h2>
-          <div className="flex flex-col gap-2">
-            {LEVELS.map((l) => {
-              const isLocked = l.id > unlocked;
-              const active = l.id === levelId;
-              return (
-                <button
-                  key={l.id}
-                  onClick={() => pickLevel(l.id)}
-                  disabled={isLocked}
-                  className="text-left px-3 py-2 text-xs tracking-wider border transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{
-                    background: active ? l.ground : "transparent",
-                    color: active ? "#ffffff" : isLocked ? "#6b6b6b" : "#e6e6e6",
-                    borderColor: active ? l.ground : "#3a4250",
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <span>{String(l.id).padStart(2, "0")} {isLocked && "🔒"}</span>
-                    <span style={{ color: active ? "#ffffff" : l.ground }}>{l.target < 9999 ? l.target : "∞"}</span>
-                  </div>
-                  <div className="text-[10px] opacity-70 mt-0.5 truncate">{l.name.replace(/^ТРАССА \d+ · /, "")}</div>
-                </button>
-              );
-            })}
+          <div className="flex gap-1 mb-3">
+            <button
+              onClick={() => setLevelTab("std")}
+              className="flex-1 py-1 text-[10px] font-black tracking-wider border"
+              style={{
+                background: levelTab === "std" ? "#1c69d4" : "transparent",
+                color: levelTab === "std" ? "#fff" : "#1c69d4",
+                borderColor: "#1c69d4",
+              }}
+            >УРОВНИ</button>
+            <button
+              onClick={() => setLevelTab("custom")}
+              className="flex-1 py-1 text-[10px] font-black tracking-wider border"
+              style={{
+                background: levelTab === "custom" ? "#22e6ff" : "transparent",
+                color: levelTab === "custom" ? "#0a0a0a" : "#22e6ff",
+                borderColor: "#22e6ff",
+              }}
+            >СВОИ</button>
           </div>
+          {levelTab === "std" ? (
+            <div className="flex flex-col gap-2">
+              {LEVELS.map((l) => {
+                const isLocked = l.id > unlocked;
+                const active = l.id === levelId;
+                return (
+                  <button
+                    key={l.id}
+                    onClick={() => pickLevel(l.id)}
+                    disabled={isLocked}
+                    className="text-left px-3 py-2 text-xs tracking-wider border transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    style={{
+                      background: active ? l.ground : "transparent",
+                      color: active ? "#ffffff" : isLocked ? "#6b6b6b" : "#e6e6e6",
+                      borderColor: active ? l.ground : "#3a4250",
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span>{String(l.id).padStart(2, "0")} {isLocked && "🔒"}</span>
+                      <span style={{ color: active ? "#ffffff" : l.ground }}>{l.target < 9999 ? l.target : "∞"}</span>
+                    </div>
+                    <div className="text-[10px] opacity-70 mt-0.5 truncate">{l.name.replace(/^ТРАССА \d+ · /, "")}</div>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={openCreateEditor}
+                className="px-3 py-2 text-xs font-black tracking-wider border-2 border-dashed transition-colors hover:bg-[#22e6ff] hover:text-[#0a0a0a]"
+                style={{ borderColor: "#22e6ff", color: "#22e6ff" }}
+              >+ СОЗДАТЬ УРОВЕНЬ</button>
+              {customLevels.length === 0 && (
+                <p className="text-[10px] text-center mt-2" style={{ color: "#6b6b6b" }}>
+                  Создай свой уровень: настрой скорость, цвета, тему и цель.
+                </p>
+              )}
+              {customLevels.map((l) => {
+                const active = l.id === levelId;
+                return (
+                  <div
+                    key={l.id}
+                    className="border"
+                    style={{
+                      background: active ? l.ground : "transparent",
+                      borderColor: active ? l.ground : "#3a4250",
+                    }}
+                  >
+                    <button
+                      onClick={() => pickLevel(l.id)}
+                      className="text-left w-full px-3 py-2 text-xs tracking-wider"
+                      style={{ color: active ? "#ffffff" : "#e6e6e6" }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span>★ {l.name.slice(0, 14)}</span>
+                        <span style={{ color: active ? "#ffffff" : l.ground }}>{l.target}</span>
+                      </div>
+                    </button>
+                    <div className="flex gap-1 px-2 pb-2">
+                      <button
+                        onClick={() => openEditEditor(l)}
+                        className="flex-1 py-0.5 text-[10px] border"
+                        style={{ borderColor: "#facc15", color: active ? "#fff" : "#facc15" }}
+                      >ИЗМ.</button>
+                      <button
+                        onClick={() => deleteCustom(l.id)}
+                        className="flex-1 py-0.5 text-[10px] border"
+                        style={{ borderColor: "#e22718", color: active ? "#fff" : "#e22718" }}
+                      >УДАЛ.</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </aside>
 
         {/* Canvas */}
@@ -1132,6 +1256,108 @@ function Game() {
             >
               КРУТО!
             </button>
+          </div>
+        </div>
+      )}
+
+      {editorOpen && editorDraft && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.85)" }} onClick={() => setEditorOpen(false)}>
+          <div className="max-w-xl w-full p-6 font-mono max-h-[90vh] overflow-y-auto" style={{ background: "#1a2129", border: "2px solid #22e6ff" }} onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-black" style={{ color: "#22e6ff" }}>РЕДАКТОР УРОВНЯ</h2>
+              <button onClick={() => setEditorOpen(false)} className="text-xl px-2" style={{ color: "#6b6b6b" }}>✕</button>
+            </div>
+
+            <div className="flex flex-col gap-3 text-xs" style={{ color: "#e6e6e6" }}>
+              <label className="flex flex-col gap-1">
+                <span style={{ color: "#22e6ff" }}>НАЗВАНИЕ</span>
+                <input
+                  value={editorDraft.name}
+                  onChange={(e) => setEditorDraft({ ...editorDraft, name: e.target.value })}
+                  className="px-2 py-1 bg-black/40 border" style={{ borderColor: "#3a4250", color: "#fff" }}
+                />
+              </label>
+
+              <div className="grid grid-cols-2 gap-3">
+                <label className="flex flex-col gap-1">
+                  <span style={{ color: "#22e6ff" }}>ЦЕЛЬ (дистанция): {editorDraft.target}</span>
+                  <input type="range" min={100} max={9999} step={50}
+                    value={editorDraft.target}
+                    onChange={(e) => setEditorDraft({ ...editorDraft, target: Number(e.target.value) })} />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span style={{ color: "#22e6ff" }}>СКОРОСТЬ: {editorDraft.speed.toFixed(1)}</span>
+                  <input type="range" min={3} max={10} step={0.1}
+                    value={editorDraft.speed}
+                    onChange={(e) => setEditorDraft({ ...editorDraft, speed: Number(e.target.value) })} />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span style={{ color: "#22e6ff" }}>ГРАВИТАЦИЯ: {editorDraft.gravity.toFixed(2)}</span>
+                  <input type="range" min={0.3} max={0.7} step={0.01}
+                    value={editorDraft.gravity}
+                    onChange={(e) => setEditorDraft({ ...editorDraft, gravity: Number(e.target.value) })} />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span style={{ color: "#22e6ff" }}>ШАНС СТЕН: {Math.round(editorDraft.wallChance * 100)}%</span>
+                  <input type="range" min={0} max={1} step={0.05}
+                    value={editorDraft.wallChance}
+                    onChange={(e) => setEditorDraft({ ...editorDraft, wallChance: Number(e.target.value) })} />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span style={{ color: "#22e6ff" }}>МИН. РАЗРЫВ: {editorDraft.gapMin}</span>
+                  <input type="range" min={60} max={400} step={10}
+                    value={editorDraft.gapMin}
+                    onChange={(e) => setEditorDraft({ ...editorDraft, gapMin: Number(e.target.value) })} />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span style={{ color: "#22e6ff" }}>МАКС. РАЗРЫВ: {editorDraft.gapMax}</span>
+                  <input type="range" min={80} max={600} step={10}
+                    value={editorDraft.gapMax}
+                    onChange={(e) => setEditorDraft({ ...editorDraft, gapMax: Number(e.target.value) })} />
+                </label>
+              </div>
+
+              <label className="flex flex-col gap-1">
+                <span style={{ color: "#22e6ff" }}>ТЕМА ФОНА</span>
+                <select
+                  value={editorDraft.theme}
+                  onChange={(e) => setEditorDraft({ ...editorDraft, theme: e.target.value as Theme })}
+                  className="px-2 py-1 bg-black/40 border" style={{ borderColor: "#3a4250", color: "#fff" }}
+                >
+                  {(["warmup","city","desert","jungle","neon","arctic","volcano","void","cyber","space","swamp","candy","graveyard","underwater","sunset","factory","crystal","abyss","aurora","omega"] as Theme[]).map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </label>
+
+              <div className="grid grid-cols-4 gap-2">
+                {([["bgTop","ФОН ВЕРХ"],["bgBot","ФОН НИЗ"],["ground","ПЛАТФОРМЫ"],["wall","СТЕНЫ"]] as const).map(([k, label]) => (
+                  <label key={k} className="flex flex-col gap-1 items-center">
+                    <span className="text-[10px]" style={{ color: "#22e6ff" }}>{label}</span>
+                    <input
+                      type="color"
+                      value={(editorDraft as any)[k]}
+                      onChange={(e) => setEditorDraft({ ...editorDraft, [k]: e.target.value } as Level)}
+                      className="w-12 h-10 bg-transparent border cursor-pointer"
+                      style={{ borderColor: "#3a4250" }}
+                    />
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-2 mt-5">
+              <button
+                onClick={() => setEditorOpen(false)}
+                className="flex-1 py-2 font-bold text-xs tracking-wider uppercase border"
+                style={{ borderColor: "#6b6b6b", color: "#6b6b6b" }}
+              >ОТМЕНА</button>
+              <button
+                onClick={saveEditor}
+                className="flex-1 py-2 font-bold text-xs tracking-wider uppercase"
+                style={{ background: "#22e6ff", color: "#0a0a0a" }}
+              >СОХРАНИТЬ И ИГРАТЬ</button>
+            </div>
           </div>
         </div>
       )}
