@@ -394,9 +394,14 @@ function Game() {
   const [submitting, setSubmitting] = useState(false);
   const [showRules, setShowRules] = useState(false);
 
+  const DEFAULT_OWNED = useMemo(
+    () => SKINS.filter((s) => s.shape === "square" && ["БЕЛЫЙ", "СИНИЙ", "КРАСНЫЙ"].some((n) => s.name.endsWith(n))).map((s) => s.id),
+    []
+  );
+
   const [skinId, setSkinId] = useState<string>(() => {
-    if (typeof window === "undefined") return "white";
-    return localStorage.getItem("np_skin") ?? "white";
+    if (typeof window === "undefined") return SKINS[0].id;
+    return localStorage.getItem("np_skin") ?? SKINS[0].id;
   });
   const [levelId, setLevelId] = useState<number>(() => {
     if (typeof window === "undefined") return 1;
@@ -406,6 +411,25 @@ function Game() {
     if (typeof window === "undefined") return 1;
     return Number(localStorage.getItem("np_unlocked") ?? 1);
   });
+  const [owned, setOwned] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = localStorage.getItem("np_owned");
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return [];
+  });
+  const [lastClaim, setLastClaim] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem("np_last_claim") ?? "";
+  });
+  const [giftPopup, setGiftPopup] = useState<Skin[] | null>(null);
+
+  // Seed defaults on first mount if owned is empty
+  useEffect(() => {
+    if (owned.length === 0) setOwned(DEFAULT_OWNED);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const level = useMemo(() => LEVELS.find((l) => l.id === levelId) ?? LEVELS[0], [levelId]);
   const skin = useMemo(() => SKINS.find((s) => s.id === skinId) ?? SKINS[0], [skinId]);
@@ -420,6 +444,30 @@ function Game() {
   useEffect(() => { localStorage.setItem("np_skin", skinId); }, [skinId]);
   useEffect(() => { localStorage.setItem("np_level", String(levelId)); }, [levelId]);
   useEffect(() => { localStorage.setItem("np_unlocked", String(unlocked)); }, [unlocked]);
+  useEffect(() => { localStorage.setItem("np_owned", JSON.stringify(owned)); }, [owned]);
+  useEffect(() => { localStorage.setItem("np_last_claim", lastClaim); }, [lastClaim]);
+
+  const today = new Date().toISOString().slice(0, 10);
+  const canClaim = lastClaim !== today;
+
+  function claimDaily() {
+    if (!canClaim) return;
+    const locked = SKINS.filter((s) => !owned.includes(s.id));
+    if (locked.length === 0) {
+      setLastClaim(today);
+      return;
+    }
+    const count = Math.min(3, locked.length);
+    const picked: Skin[] = [];
+    const pool = [...locked];
+    for (let i = 0; i < count; i++) {
+      const idx = Math.floor(Math.random() * pool.length);
+      picked.push(pool.splice(idx, 1)[0]);
+    }
+    setOwned([...owned, ...picked.map((s) => s.id)]);
+    setLastClaim(today);
+    setGiftPopup(picked);
+  }
 
   async function loadLeaders() {
     const { data } = await supabase
@@ -761,25 +809,53 @@ function Game() {
 
         {/* Right: skins + leaderboard */}
         <div className="w-full lg:w-64 flex flex-col gap-4">
+          <aside className="p-4 font-mono" style={{ background: "rgba(26,33,41,0.7)", border: "1px solid #facc15" }}>
+            <h2 className="text-sm font-black mb-2 tracking-wider" style={{ color: "#facc15" }}>🎁 ЕЖЕДНЕВНЫЙ ПОДАРОК</h2>
+            <p className="text-[10px] mb-2" style={{ color: "#a3a3a3" }}>
+              {canClaim ? "Забери 3 случайных скина!" : "Возвращайся завтра за новым подарком."}
+            </p>
+            <button
+              onClick={claimDaily}
+              disabled={!canClaim}
+              className="w-full py-2 font-bold text-xs tracking-wider uppercase transition-opacity disabled:opacity-40"
+              style={{ background: canClaim ? "#facc15" : "#3a4250", color: "#0a0a0a" }}
+            >
+              {canClaim ? "ЗАБРАТЬ ПОДАРОК" : "ПОЛУЧЕНО"}
+            </button>
+            <div className="mt-2 text-[10px]" style={{ color: "#6b6b6b" }}>
+              Открыто: {owned.length} / {SKINS.length}
+            </div>
+          </aside>
+
           <aside className="p-4 font-mono" style={{ background: "rgba(26,33,41,0.7)", border: "1px solid #1c69d4" }}>
             <h2 className="text-sm font-black mb-3 tracking-wider" style={{ color: "#1c69d4" }}>СКИНЫ</h2>
-            <div className="grid grid-cols-5 gap-2">
-              {SKINS.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => setSkinId(s.id)}
-                  title={s.name}
-                  className="aspect-square flex items-center justify-center border-2 transition-transform hover:scale-105"
-                  style={{
-                    background: "rgba(0,0,0,0.3)",
-                    borderColor: skinId === s.id ? "#ffffff" : "#3a4250",
-                    outline: skinId === s.id ? "2px solid #1c69d4" : "none",
-                    outlineOffset: "2px",
-                  }}
-                >
-                  <ShapeSwatch shape={s.shape} body={s.body} stroke={s.stroke} />
-                </button>
-              ))}
+            <div className="grid grid-cols-5 gap-2 max-h-80 overflow-y-auto pr-1">
+              {SKINS.map((s) => {
+                const isOwned = owned.includes(s.id);
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => isOwned && setSkinId(s.id)}
+                    disabled={!isOwned}
+                    title={isOwned ? s.name : "🔒 Заблокировано"}
+                    className="aspect-square flex items-center justify-center border-2 transition-transform hover:scale-105 disabled:cursor-not-allowed"
+                    style={{
+                      background: "rgba(0,0,0,0.3)",
+                      borderColor: skinId === s.id ? "#ffffff" : "#3a4250",
+                      outline: skinId === s.id ? "2px solid #1c69d4" : "none",
+                      outlineOffset: "2px",
+                      opacity: isOwned ? 1 : 0.25,
+                      filter: isOwned ? "none" : "grayscale(1)",
+                    }}
+                  >
+                    {isOwned ? (
+                      <ShapeSwatch shape={s.shape} body={s.body} stroke={s.stroke} />
+                    ) : (
+                      <span className="text-base">🔒</span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
             <div className="mt-2 text-[10px] tracking-wider" style={{ color: "#6b6b6b" }}>ВЫБРАН: <span style={{ color: skin.body }}>{skin.name}</span></div>
@@ -802,6 +878,41 @@ function Game() {
           </aside>
         </div>
       </div>
+
+      {giftPopup && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(0,0,0,0.85)" }}
+          onClick={() => setGiftPopup(null)}
+        >
+          <div
+            className="p-6 font-mono max-w-md w-full text-center"
+            style={{ background: "#1a2129", border: "2px solid #facc15" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-4xl mb-3">🎁</div>
+            <h3 className="text-2xl font-black mb-1" style={{ color: "#facc15" }}>ПОДАРОК ДНЯ!</h3>
+            <p className="text-xs mb-5" style={{ color: "#a3a3a3" }}>Ты получил {giftPopup.length} новых скина:</p>
+            <div className="flex justify-center gap-4 mb-5">
+              {giftPopup.map((s) => (
+                <div key={s.id} className="flex flex-col items-center gap-2">
+                  <div className="w-16 h-16 flex items-center justify-center border-2" style={{ background: "rgba(0,0,0,0.3)", borderColor: "#facc15" }}>
+                    <ShapeSwatch shape={s.shape} body={s.body} stroke={s.stroke} />
+                  </div>
+                  <div className="text-[10px]" style={{ color: s.body }}>{s.name}</div>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setGiftPopup(null)}
+              className="px-6 py-2 font-bold text-sm tracking-wider uppercase"
+              style={{ background: "#facc15", color: "#0a0a0a" }}
+            >
+              КРУТО!
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
