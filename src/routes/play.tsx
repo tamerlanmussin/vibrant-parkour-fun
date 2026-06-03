@@ -16,7 +16,7 @@ type LeaderRow = { username: string; best_score: number };
 type Profile = { username: string; best_score: number };
 type Platform = { x: number; y: number; w: number; h: number; kind: "ground" | "wall" };
 
-type Theme = "warmup" | "city" | "desert" | "jungle" | "neon" | "arctic" | "volcano" | "void" | "cyber" | "space" | "swamp" | "candy" | "graveyard" | "underwater" | "sunset" | "factory" | "crystal" | "abyss";
+type Theme = "warmup" | "city" | "desert" | "jungle" | "neon" | "arctic" | "volcano" | "void" | "cyber" | "space" | "swamp" | "candy" | "graveyard" | "underwater" | "sunset" | "factory" | "crystal" | "abyss" | "aurora" | "omega";
 
 type Level = {
   id: number;
