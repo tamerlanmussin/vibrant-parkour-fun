@@ -27,6 +27,7 @@ function Game() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [leaders, setLeaders] = useState<LeaderRow[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [showRules, setShowRules] = useState(false);
   const lastSubmittedRef = useRef<number>(-1);
 
   async function loadLeaders() {
