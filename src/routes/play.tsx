@@ -268,10 +268,15 @@ function Game() {
       g.addColorStop(0, L.bgTop); g.addColorStop(1, L.bgBot);
       ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
 
-      ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 1;
-      const off = (cameraX * 0.3) % 60;
-      for (let x = -off; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
-      for (let y = 0; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+      drawBackdrop(ctx, L.theme, cameraX, W, H);
+
+      if (L.theme === "warmup" || L.theme === "void") {
+        ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 1;
+        const off = (cameraX * 0.3) % 60;
+        for (let x = -off; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+        for (let y = 0; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+      }
+
 
       ctx.save();
       ctx.translate(-cameraX, 0);
