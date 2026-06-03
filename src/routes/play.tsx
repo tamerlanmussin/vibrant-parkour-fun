@@ -46,7 +46,7 @@ const LEVELS: Level[] = [
 ];
 
 
-type Shape = "square" | "circle" | "triangle" | "diamond" | "hexagon" | "star" | "pill" | "cross" | "ring" | "heart";
+type Shape = "square" | "circle" | "triangle" | "diamond" | "hexagon" | "star" | "pill" | "cross" | "ring" | "heart" | "quad";
 type Skin = { id: string; name: string; body: string; stroke: string; shape: Shape };
 const SKINS: Skin[] = [
   { id: "white",   name: "КУБ",       body: "#ffffff", stroke: "#262626", shape: "square" },
@@ -59,7 +59,9 @@ const SKINS: Skin[] = [
   { id: "lime",    name: "КРЕСТ",     body: "#a3e635", stroke: "#365314", shape: "cross" },
   { id: "violet",  name: "КОЛЬЦО",    body: "#a855f7", stroke: "#3b0764", shape: "ring" },
   { id: "rose",    name: "СЕРДЦЕ",    body: "#fb7185", stroke: "#881337", shape: "heart" },
+  { id: "quad",    name: "4-В-1",     body: "#f59e0b", stroke: "#1f2937", shape: "quad" },
 ];
+
 
 function drawShape(ctx: CanvasRenderingContext2D, shape: Shape, x: number, y: number, w: number, h: number, body: string, stroke: string) {
   ctx.fillStyle = body;
