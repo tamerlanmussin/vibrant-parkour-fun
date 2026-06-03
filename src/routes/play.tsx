@@ -203,13 +203,11 @@ function Game() {
     function update() {
       if (!alive || finished) return;
       const L = levelRef.current;
-      const accel = 0.6;
+      const accel = 1.2;
       const max = L.speed;
       if (keys["ArrowLeft"] || keys["KeyA"]) player.vx = Math.max(player.vx - accel, -max);
       else if (keys["ArrowRight"] || keys["KeyD"]) player.vx = Math.min(player.vx + accel, max);
-      else player.vx *= 0.82;
-      player.vx += 0.08;
-      if (player.vx > max) player.vx = max;
+      else player.vx = player.onGround ? 0 : player.vx * 0.9;
 
       const jumpPressed = keys["Space"] || keys["ArrowUp"] || keys["KeyW"];
       if (jumpPressed && !jumpHeld) {
