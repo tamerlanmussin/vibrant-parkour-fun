@@ -691,22 +691,25 @@ function Game() {
         <div className="w-full lg:w-64 flex flex-col gap-4">
           <aside className="p-4 font-mono" style={{ background: "rgba(26,33,41,0.7)", border: "1px solid #1c69d4" }}>
             <h2 className="text-sm font-black mb-3 tracking-wider" style={{ color: "#1c69d4" }}>СКИНЫ</h2>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-5 gap-2">
               {SKINS.map((s) => (
                 <button
                   key={s.id}
                   onClick={() => setSkinId(s.id)}
                   title={s.name}
-                  className="aspect-square border-2 transition-transform hover:scale-105"
+                  className="aspect-square flex items-center justify-center border-2 transition-transform hover:scale-105"
                   style={{
-                    background: s.body,
-                    borderColor: skinId === s.id ? "#ffffff" : s.stroke,
+                    background: "rgba(0,0,0,0.3)",
+                    borderColor: skinId === s.id ? "#ffffff" : "#3a4250",
                     outline: skinId === s.id ? "2px solid #1c69d4" : "none",
                     outlineOffset: "2px",
                   }}
-                />
+                >
+                  <ShapeSwatch shape={s.shape} body={s.body} stroke={s.stroke} />
+                </button>
               ))}
             </div>
+
             <div className="mt-2 text-[10px] tracking-wider" style={{ color: "#6b6b6b" }}>ВЫБРАН: <span style={{ color: skin.body }}>{skin.name}</span></div>
           </aside>
 
