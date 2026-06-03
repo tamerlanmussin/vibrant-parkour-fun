@@ -46,7 +46,7 @@ const LEVELS: Level[] = [
 ];
 
 
-type Shape = "square" | "circle" | "triangle" | "diamond" | "hexagon" | "star" | "pill" | "cross" | "ring" | "heart";
+type Shape = "square" | "circle" | "triangle" | "diamond" | "hexagon" | "star" | "pill" | "cross" | "ring" | "heart" | "quad";
 type Skin = { id: string; name: string; body: string; stroke: string; shape: Shape };
 const SKINS: Skin[] = [
   { id: "white",   name: "КУБ",       body: "#ffffff", stroke: "#262626", shape: "square" },
@@ -59,7 +59,9 @@ const SKINS: Skin[] = [
   { id: "lime",    name: "КРЕСТ",     body: "#a3e635", stroke: "#365314", shape: "cross" },
   { id: "violet",  name: "КОЛЬЦО",    body: "#a855f7", stroke: "#3b0764", shape: "ring" },
   { id: "rose",    name: "СЕРДЦЕ",    body: "#fb7185", stroke: "#881337", shape: "heart" },
+  { id: "quad",    name: "4-В-1",     body: "#f59e0b", stroke: "#1f2937", shape: "quad" },
 ];
+
 
 function drawShape(ctx: CanvasRenderingContext2D, shape: Shape, x: number, y: number, w: number, h: number, body: string, stroke: string) {
   ctx.fillStyle = body;
@@ -146,6 +148,26 @@ function drawShape(ctx: CanvasRenderingContext2D, shape: Shape, x: number, y: nu
       ctx.bezierCurveTo(x - w * 0.1, cy, x + w * 0.15, y, cx, topY);
       ctx.bezierCurveTo(x + w * 0.85, y, x + w * 1.1, cy, cx, y + h);
       ctx.closePath(); ctx.fill(); ctx.stroke();
+      break;
+    }
+    case "quad": {
+      // outer cube
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+      // 4 inner cubes — 2x2 grid with different colors
+      const pad = Math.max(2, w * 0.12);
+      const gap = Math.max(1, w * 0.05);
+      const innerW = (w - pad * 2 - gap) / 2;
+      const innerH = (h - pad * 2 - gap) / 2;
+      const colors = ["#e22718", "#1c69d4", "#22e6ff", "#a3e635"];
+      for (let i = 0; i < 4; i++) {
+        const ix = x + pad + (i % 2) * (innerW + gap);
+        const iy = y + pad + Math.floor(i / 2) * (innerH + gap);
+        ctx.fillStyle = colors[i];
+        ctx.fillRect(ix, iy, innerW, innerH);
+        ctx.strokeStyle = stroke;
+        ctx.strokeRect(ix + 0.5, iy + 0.5, innerW - 1, innerH - 1);
+      }
       break;
     }
   }
