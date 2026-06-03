@@ -58,6 +58,163 @@ const SKINS: Skin[] = [
   { id: "lime",    name: "ЛАЙМ",     body: "#a3e635", stroke: "#365314" },
 ];
 
+// Hash-based pseudo-random for stable parallax scenery
+function rand(seed: number) {
+  const x = Math.sin(seed * 9301 + 49297) * 233280;
+  return x - Math.floor(x);
+}
+
+function drawBackdrop(ctx: CanvasRenderingContext2D, theme: Theme, cam: number, W: number, H: number) {
+  const horizon = H - 80;
+
+  if (theme === "city") {
+    const farOff = cam * 0.15;
+    ctx.fillStyle = "rgba(20,40,70,0.7)";
+    for (let i = -2; i < 40; i++) {
+      const sx = i * 90 - (farOff % 90);
+      const h = 80 + rand(i + 1) * 140;
+      ctx.fillRect(sx, horizon - h, 70, h);
+      ctx.fillStyle = "rgba(180,210,255,0.18)";
+      for (let wy = horizon - h + 8; wy < horizon - 8; wy += 14) {
+        for (let wx = sx + 6; wx < sx + 64; wx += 12) {
+          if (rand(i * 50 + wy + wx) > 0.5) ctx.fillRect(wx, wy, 4, 6);
+        }
+      }
+      ctx.fillStyle = "rgba(20,40,70,0.7)";
+    }
+    const nearOff = cam * 0.4;
+    ctx.fillStyle = "rgba(10,20,40,0.85)";
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 140 - (nearOff % 140);
+      const h = 140 + rand(i + 99) * 180;
+      ctx.fillRect(sx, horizon - h, 110, h);
+    }
+  } else if (theme === "desert") {
+    const off1 = cam * 0.2;
+    ctx.fillStyle = "rgba(140,80,30,0.5)";
+    ctx.beginPath(); ctx.moveTo(0, H);
+    for (let x = 0; x <= W; x += 20) {
+      const wx = x + off1;
+      const y = horizon - 30 - Math.sin(wx * 0.01) * 40 - Math.sin(wx * 0.004) * 60;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+    const off2 = cam * 0.4;
+    ctx.fillStyle = "rgba(90,45,15,0.7)";
+    ctx.beginPath(); ctx.moveTo(0, H);
+    for (let x = 0; x <= W; x += 20) {
+      const wx = x + off2;
+      const y = horizon + 10 - Math.sin(wx * 0.012 + 1) * 35;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "rgba(255,180,90,0.5)";
+    ctx.beginPath(); ctx.arc(W * 0.78, 110, 60, 0, Math.PI * 2); ctx.fill();
+  } else if (theme === "jungle") {
+    const off1 = cam * 0.2;
+    ctx.fillStyle = "rgba(10,40,20,0.7)";
+    for (let i = -2; i < 40; i++) {
+      const sx = i * 70 - (off1 % 70);
+      const r = 40 + rand(i + 3) * 30;
+      ctx.beginPath(); ctx.arc(sx, horizon - r * 0.4, r, 0, Math.PI * 2); ctx.fill();
+    }
+    const off2 = cam * 0.45;
+    ctx.fillStyle = "rgba(5,25,12,0.9)";
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 100 - (off2 % 100);
+      const r = 60 + rand(i + 77) * 40;
+      ctx.beginPath(); ctx.arc(sx, horizon - r * 0.3 + 20, r, 0, Math.PI * 2); ctx.fill();
+    }
+  } else if (theme === "neon") {
+    const off = cam * 0.2;
+    ctx.strokeStyle = "rgba(236,72,153,0.35)"; ctx.lineWidth = 1;
+    for (let i = 0; i < 14; i++) {
+      const y = horizon + i * i * 1.6;
+      if (y > H) break;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+    for (let i = -10; i <= 10; i++) {
+      ctx.beginPath();
+      const vx = W / 2 + i * 30;
+      ctx.moveTo(vx - (off % 30), horizon);
+      ctx.lineTo(W / 2 + i * 200, H);
+      ctx.stroke();
+    }
+    const tOff = cam * 0.3;
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 120 - (tOff % 120);
+      const h = 100 + rand(i + 5) * 160;
+      ctx.fillStyle = "rgba(168,85,247,0.5)";
+      ctx.fillRect(sx, horizon - h, 50, h);
+      ctx.fillStyle = "rgba(34,230,255,0.6)";
+      ctx.fillRect(sx + 22, horizon - h - 12, 6, 12);
+    }
+  } else if (theme === "arctic") {
+    const off1 = cam * 0.15;
+    ctx.fillStyle = "rgba(200,220,240,0.4)";
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 200 - (off1 % 200);
+      ctx.beginPath();
+      ctx.moveTo(sx, horizon);
+      ctx.lineTo(sx + 100, horizon - 160 - rand(i + 9) * 40);
+      ctx.lineTo(sx + 200, horizon);
+      ctx.closePath(); ctx.fill();
+    }
+    const off2 = cam * 0.35;
+    ctx.fillStyle = "rgba(150,180,210,0.6)";
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 140 - (off2 % 140);
+      ctx.beginPath();
+      ctx.moveTo(sx, horizon);
+      ctx.lineTo(sx + 70, horizon - 110 - rand(i + 22) * 30);
+      ctx.lineTo(sx + 140, horizon);
+      ctx.closePath(); ctx.fill();
+    }
+    for (let i = 0; i < 60; i++) {
+      const sx = ((i * 73 - cam * 0.6) % W + W) % W;
+      const sy = (i * 37) % H;
+      ctx.fillStyle = "rgba(255,255,255,0.6)";
+      ctx.fillRect(sx, sy, 2, 2);
+    }
+  } else if (theme === "volcano") {
+    const off1 = cam * 0.18;
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 180 - (off1 % 180);
+      const peak = horizon - 180 - rand(i + 11) * 50;
+      ctx.fillStyle = "rgba(60,10,5,0.85)";
+      ctx.beginPath();
+      ctx.moveTo(sx, horizon);
+      ctx.lineTo(sx + 90, peak);
+      ctx.lineTo(sx + 180, horizon);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "rgba(249,115,22,0.7)";
+      ctx.fillRect(sx + 85, peak + 30, 10, 60);
+    }
+    for (let i = 0; i < 40; i++) {
+      const sx = ((i * 91 - cam * 0.5) % W + W) % W;
+      const sy = (i * 53) % H;
+      ctx.fillStyle = `rgba(255,${100 + (i % 80)},20,0.7)`;
+      ctx.fillRect(sx, sy, 2, 2);
+    }
+  } else if (theme === "warmup") {
+    const off = cam * 0.2;
+    ctx.fillStyle = "rgba(28,105,212,0.18)";
+    for (let i = -2; i < 30; i++) {
+      const sx = i * 110 - (off % 110);
+      const h = 90 + rand(i + 13) * 120;
+      ctx.fillRect(sx, horizon - h, 90, h);
+    }
+  } else if (theme === "void") {
+    for (let i = 0; i < 120; i++) {
+      const sx = ((i * 137 - cam * 0.3) % W + W) % W;
+      const sy = (i * 71) % H;
+      const a = 0.3 + rand(i) * 0.7;
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.fillRect(sx, sy, rand(i + 1) > 0.85 ? 2 : 1, 1);
+    }
+  }
+}
+
 function Game() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
