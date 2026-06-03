@@ -548,10 +548,8 @@ function Game() {
         ctx.fillStyle = "rgba(255,255,255,0.18)";
         ctx.fillRect(p.x, p.y, p.w, 1);
       }
-      ctx.fillStyle = S.body;
-      ctx.fillRect(player.x, player.y, player.w, player.h);
-      ctx.strokeStyle = S.stroke; ctx.lineWidth = 1;
-      ctx.strokeRect(player.x + 0.5, player.y + 0.5, player.w - 1, player.h - 1);
+      drawShape(ctx, S.shape, player.x, player.y, player.w, player.h, S.body, S.stroke);
+
       ctx.restore();
 
       // progress bar
