@@ -46,17 +46,124 @@ const LEVELS: Level[] = [
 ];
 
 
-type Skin = { id: string; name: string; body: string; stroke: string };
+type Shape = "square" | "circle" | "triangle" | "diamond" | "hexagon" | "star" | "pill" | "cross" | "ring" | "heart";
+type Skin = { id: string; name: string; body: string; stroke: string; shape: Shape };
 const SKINS: Skin[] = [
-  { id: "white",   name: "БЕЛЫЙ",    body: "#ffffff", stroke: "#262626" },
-  { id: "blue",    name: "СИНИЙ",    body: "#1c69d4", stroke: "#0653b6" },
-  { id: "red",     name: "КРАСНЫЙ",  body: "#e22718", stroke: "#7f1d1d" },
-  { id: "neon",    name: "НЕОН",     body: "#22e6ff", stroke: "#0e7490" },
-  { id: "gold",    name: "ЗОЛОТО",   body: "#fbbf24", stroke: "#78350f" },
-  { id: "ghost",   name: "ПРИЗРАК",  body: "#94a3b8", stroke: "#ffffff" },
-  { id: "magenta", name: "МАГЕНТА",  body: "#ec4899", stroke: "#831843" },
-  { id: "lime",    name: "ЛАЙМ",     body: "#a3e635", stroke: "#365314" },
+  { id: "white",   name: "КУБ",       body: "#ffffff", stroke: "#262626", shape: "square" },
+  { id: "blue",    name: "КРУГ",      body: "#1c69d4", stroke: "#0653b6", shape: "circle" },
+  { id: "red",     name: "ТРЕУГОЛ.",  body: "#e22718", stroke: "#7f1d1d", shape: "triangle" },
+  { id: "neon",    name: "РОМБ",      body: "#22e6ff", stroke: "#0e7490", shape: "diamond" },
+  { id: "gold",    name: "ГЕКСАГОН",  body: "#fbbf24", stroke: "#78350f", shape: "hexagon" },
+  { id: "ghost",   name: "ЗВЕЗДА",    body: "#94a3b8", stroke: "#ffffff", shape: "star" },
+  { id: "magenta", name: "ПИЛЮЛЯ",    body: "#ec4899", stroke: "#831843", shape: "pill" },
+  { id: "lime",    name: "КРЕСТ",     body: "#a3e635", stroke: "#365314", shape: "cross" },
+  { id: "violet",  name: "КОЛЬЦО",    body: "#a855f7", stroke: "#3b0764", shape: "ring" },
+  { id: "rose",    name: "СЕРДЦЕ",    body: "#fb7185", stroke: "#881337", shape: "heart" },
 ];
+
+function drawShape(ctx: CanvasRenderingContext2D, shape: Shape, x: number, y: number, w: number, h: number, body: string, stroke: string) {
+  ctx.fillStyle = body;
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 1.5;
+  const cx = x + w / 2, cy = y + h / 2;
+  switch (shape) {
+    case "square":
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+      break;
+    case "circle":
+      ctx.beginPath(); ctx.ellipse(cx, cy, w / 2, h / 2, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      break;
+    case "triangle":
+      ctx.beginPath(); ctx.moveTo(cx, y); ctx.lineTo(x + w, y + h); ctx.lineTo(x, y + h); ctx.closePath(); ctx.fill(); ctx.stroke();
+      break;
+    case "diamond":
+      ctx.beginPath(); ctx.moveTo(cx, y); ctx.lineTo(x + w, cy); ctx.lineTo(cx, y + h); ctx.lineTo(x, cy); ctx.closePath(); ctx.fill(); ctx.stroke();
+      break;
+    case "hexagon": {
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a = (Math.PI / 3) * i - Math.PI / 2;
+        const px = cx + Math.cos(a) * (w / 2);
+        const py = cy + Math.sin(a) * (h / 2);
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      break;
+    }
+    case "star": {
+      ctx.beginPath();
+      const outer = w / 2, inner = w / 4;
+      for (let i = 0; i < 10; i++) {
+        const r = i % 2 === 0 ? outer : inner;
+        const a = (Math.PI / 5) * i - Math.PI / 2;
+        const px = cx + Math.cos(a) * r;
+        const py = cy + Math.sin(a) * (r * (h / w));
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      break;
+    }
+    case "pill": {
+      const r = w / 2;
+      ctx.beginPath();
+      ctx.moveTo(x, y + r);
+      ctx.arc(cx, y + r, r, Math.PI, 0);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.arc(cx, y + h - r, r, 0, Math.PI);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      break;
+    }
+    case "cross": {
+      const t = w / 3;
+      ctx.beginPath();
+      ctx.moveTo(cx - t / 2, y);
+      ctx.lineTo(cx + t / 2, y);
+      ctx.lineTo(cx + t / 2, cy - t / 2);
+      ctx.lineTo(x + w, cy - t / 2);
+      ctx.lineTo(x + w, cy + t / 2);
+      ctx.lineTo(cx + t / 2, cy + t / 2);
+      ctx.lineTo(cx + t / 2, y + h);
+      ctx.lineTo(cx - t / 2, y + h);
+      ctx.lineTo(cx - t / 2, cy + t / 2);
+      ctx.lineTo(x, cy + t / 2);
+      ctx.lineTo(x, cy - t / 2);
+      ctx.lineTo(cx - t / 2, cy - t / 2);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      break;
+    }
+    case "ring":
+      ctx.beginPath(); ctx.ellipse(cx, cy, w / 2, h / 2, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.save();
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.beginPath(); ctx.ellipse(cx, cy, w / 4, h / 4, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      break;
+    case "heart": {
+      ctx.beginPath();
+      const topY = y + h * 0.3;
+      ctx.moveTo(cx, y + h);
+      ctx.bezierCurveTo(x - w * 0.1, cy, x + w * 0.15, y, cx, topY);
+      ctx.bezierCurveTo(x + w * 0.85, y, x + w * 1.1, cy, cx, y + h);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      break;
+    }
+  }
+}
+
+function ShapeSwatch({ shape, body, stroke }: { shape: Shape; body: string; stroke: string }) {
+  // Render via canvas API on mount to reuse drawShape exactly
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const c = ref.current; if (!c) return;
+    const ctx = c.getContext("2d"); if (!ctx) return;
+    ctx.clearRect(0, 0, c.width, c.height);
+    drawShape(ctx, shape, 6, 6, 28, 28, body, stroke);
+  }, [shape, body, stroke]);
+  return <canvas ref={ref} width={40} height={40} className="w-full h-full" />;
+}
+
+
 
 // Hash-based pseudo-random for stable parallax scenery
 function rand(seed: number) {
@@ -454,10 +561,8 @@ function Game() {
         ctx.fillStyle = "rgba(255,255,255,0.18)";
         ctx.fillRect(p.x, p.y, p.w, 1);
       }
-      ctx.fillStyle = S.body;
-      ctx.fillRect(player.x, player.y, player.w, player.h);
-      ctx.strokeStyle = S.stroke; ctx.lineWidth = 1;
-      ctx.strokeRect(player.x + 0.5, player.y + 0.5, player.w - 1, player.h - 1);
+      drawShape(ctx, S.shape, player.x, player.y, player.w, player.h, S.body, S.stroke);
+
       ctx.restore();
 
       // progress bar
@@ -599,22 +704,25 @@ function Game() {
         <div className="w-full lg:w-64 flex flex-col gap-4">
           <aside className="p-4 font-mono" style={{ background: "rgba(26,33,41,0.7)", border: "1px solid #1c69d4" }}>
             <h2 className="text-sm font-black mb-3 tracking-wider" style={{ color: "#1c69d4" }}>СКИНЫ</h2>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-5 gap-2">
               {SKINS.map((s) => (
                 <button
                   key={s.id}
                   onClick={() => setSkinId(s.id)}
                   title={s.name}
-                  className="aspect-square border-2 transition-transform hover:scale-105"
+                  className="aspect-square flex items-center justify-center border-2 transition-transform hover:scale-105"
                   style={{
-                    background: s.body,
-                    borderColor: skinId === s.id ? "#ffffff" : s.stroke,
+                    background: "rgba(0,0,0,0.3)",
+                    borderColor: skinId === s.id ? "#ffffff" : "#3a4250",
                     outline: skinId === s.id ? "2px solid #1c69d4" : "none",
                     outlineOffset: "2px",
                   }}
-                />
+                >
+                  <ShapeSwatch shape={s.shape} body={s.body} stroke={s.stroke} />
+                </button>
               ))}
             </div>
+
             <div className="mt-2 text-[10px] tracking-wider" style={{ color: "#6b6b6b" }}>ВЫБРАН: <span style={{ color: skin.body }}>{skin.name}</span></div>
           </aside>
 
