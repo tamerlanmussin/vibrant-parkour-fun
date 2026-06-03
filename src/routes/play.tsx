@@ -52,7 +52,9 @@ const LEVELS: Level[] = [
   { id: 15, name: "ТРАССА 15 · ЗАКАТ", target: 6000, gapMin: 230, gapMax: 460, wallChance: 0.70, gravity: 0.49, speed: 8.4, bgTop: "#2a0a05", bgBot: "#4a1a0a", ground: "#fb923c", wall: "#f43f5e", theme: "sunset" },
   { id: 16, name: "ТРАССА 16 · ФАБРИКА", target: 6700, gapMin: 240, gapMax: 480, wallChance: 0.70, gravity: 0.50, speed: 8.6, bgTop: "#1a1a1a", bgBot: "#262626", ground: "#facc15", wall: "#ef4444", theme: "factory" },
   { id: 17, name: "ТРАССА 17 · КРИСТАЛЛЫ", target: 7500, gapMin: 250, gapMax: 500, wallChance: 0.72, gravity: 0.50, speed: 8.8, bgTop: "#0a0a1a", bgBot: "#1a1a2e", ground: "#22d3ee", wall: "#a78bfa", theme: "crystal" },
-  { id: 18, name: "ТРАССА 18 · БЕСКОНЕЧНОСТЬ", target: 9999, gapMin: 260, gapMax: 520, wallChance: 0.72, gravity: 0.50, speed: 9.0, bgTop: "#000000", bgBot: "#050505", ground: "#ffffff", wall: "#ef4444", theme: "abyss" },
+  { id: 18, name: "ТРАССА 18 · БЕЗДНА", target: 8200, gapMin: 260, gapMax: 520, wallChance: 0.72, gravity: 0.50, speed: 9.0, bgTop: "#000000", bgBot: "#050505", ground: "#ffffff", wall: "#ef4444", theme: "abyss" },
+  { id: 19, name: "ТРАССА 19 · СИЯНИЕ", target: 9000, gapMin: 270, gapMax: 540, wallChance: 0.74, gravity: 0.50, speed: 9.2, bgTop: "#050a10", bgBot: "#0a1a15", ground: "#34d399", wall: "#a78bfa", theme: "aurora" },
+  { id: 20, name: "ТРАССА 20 · ОМЕГА", target: 9999, gapMin: 280, gapMax: 560, wallChance: 0.75, gravity: 0.52, speed: 9.5, bgTop: "#0a0000", bgBot: "#1a0505", ground: "#fbbf24", wall: "#ef4444", theme: "omega" },
 ];
 
 
