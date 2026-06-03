@@ -791,6 +791,7 @@ function Game() {
     } else {
       setCustomLevels([...customLevels, editorDraft]);
     }
+    setLevelId(editorDraft.id);
     setEditorOpen(false);
     setEditorDraft(null);
   }
