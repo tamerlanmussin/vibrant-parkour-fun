@@ -1020,32 +1020,102 @@ function Game() {
       <div className="flex flex-col lg:flex-row gap-4 items-start justify-center w-full max-w-6xl">
         {/* Left: levels */}
         <aside className="w-full lg:w-56 p-4 font-mono" style={{ background: "rgba(26,33,41,0.7)", border: "1px solid #1c69d4" }}>
-          <h2 className="text-sm font-black mb-3 tracking-wider" style={{ color: "#1c69d4" }}>УРОВНИ</h2>
-          <div className="flex flex-col gap-2">
-            {LEVELS.map((l) => {
-              const isLocked = l.id > unlocked;
-              const active = l.id === levelId;
-              return (
-                <button
-                  key={l.id}
-                  onClick={() => pickLevel(l.id)}
-                  disabled={isLocked}
-                  className="text-left px-3 py-2 text-xs tracking-wider border transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{
-                    background: active ? l.ground : "transparent",
-                    color: active ? "#ffffff" : isLocked ? "#6b6b6b" : "#e6e6e6",
-                    borderColor: active ? l.ground : "#3a4250",
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <span>{String(l.id).padStart(2, "0")} {isLocked && "🔒"}</span>
-                    <span style={{ color: active ? "#ffffff" : l.ground }}>{l.target < 9999 ? l.target : "∞"}</span>
-                  </div>
-                  <div className="text-[10px] opacity-70 mt-0.5 truncate">{l.name.replace(/^ТРАССА \d+ · /, "")}</div>
-                </button>
-              );
-            })}
+          <div className="flex gap-1 mb-3">
+            <button
+              onClick={() => setLevelTab("std")}
+              className="flex-1 py-1 text-[10px] font-black tracking-wider border"
+              style={{
+                background: levelTab === "std" ? "#1c69d4" : "transparent",
+                color: levelTab === "std" ? "#fff" : "#1c69d4",
+                borderColor: "#1c69d4",
+              }}
+            >УРОВНИ</button>
+            <button
+              onClick={() => setLevelTab("custom")}
+              className="flex-1 py-1 text-[10px] font-black tracking-wider border"
+              style={{
+                background: levelTab === "custom" ? "#22e6ff" : "transparent",
+                color: levelTab === "custom" ? "#0a0a0a" : "#22e6ff",
+                borderColor: "#22e6ff",
+              }}
+            >СВОИ</button>
           </div>
+          {levelTab === "std" ? (
+            <div className="flex flex-col gap-2">
+              {LEVELS.map((l) => {
+                const isLocked = l.id > unlocked;
+                const active = l.id === levelId;
+                return (
+                  <button
+                    key={l.id}
+                    onClick={() => pickLevel(l.id)}
+                    disabled={isLocked}
+                    className="text-left px-3 py-2 text-xs tracking-wider border transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    style={{
+                      background: active ? l.ground : "transparent",
+                      color: active ? "#ffffff" : isLocked ? "#6b6b6b" : "#e6e6e6",
+                      borderColor: active ? l.ground : "#3a4250",
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span>{String(l.id).padStart(2, "0")} {isLocked && "🔒"}</span>
+                      <span style={{ color: active ? "#ffffff" : l.ground }}>{l.target < 9999 ? l.target : "∞"}</span>
+                    </div>
+                    <div className="text-[10px] opacity-70 mt-0.5 truncate">{l.name.replace(/^ТРАССА \d+ · /, "")}</div>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={openCreateEditor}
+                className="px-3 py-2 text-xs font-black tracking-wider border-2 border-dashed transition-colors hover:bg-[#22e6ff] hover:text-[#0a0a0a]"
+                style={{ borderColor: "#22e6ff", color: "#22e6ff" }}
+              >+ СОЗДАТЬ УРОВЕНЬ</button>
+              {customLevels.length === 0 && (
+                <p className="text-[10px] text-center mt-2" style={{ color: "#6b6b6b" }}>
+                  Создай свой уровень: настрой скорость, цвета, тему и цель.
+                </p>
+              )}
+              {customLevels.map((l) => {
+                const active = l.id === levelId;
+                return (
+                  <div
+                    key={l.id}
+                    className="border"
+                    style={{
+                      background: active ? l.ground : "transparent",
+                      borderColor: active ? l.ground : "#3a4250",
+                    }}
+                  >
+                    <button
+                      onClick={() => pickLevel(l.id)}
+                      className="text-left w-full px-3 py-2 text-xs tracking-wider"
+                      style={{ color: active ? "#ffffff" : "#e6e6e6" }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span>★ {l.name.slice(0, 14)}</span>
+                        <span style={{ color: active ? "#ffffff" : l.ground }}>{l.target}</span>
+                      </div>
+                    </button>
+                    <div className="flex gap-1 px-2 pb-2">
+                      <button
+                        onClick={() => openEditEditor(l)}
+                        className="flex-1 py-0.5 text-[10px] border"
+                        style={{ borderColor: "#facc15", color: active ? "#fff" : "#facc15" }}
+                      >ИЗМ.</button>
+                      <button
+                        onClick={() => deleteCustom(l.id)}
+                        className="flex-1 py-0.5 text-[10px] border"
+                        style={{ borderColor: "#e22718", color: active ? "#fff" : "#e22718" }}
+                      >УДАЛ.</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </aside>
 
         {/* Canvas */}
