@@ -325,7 +325,7 @@ function Game() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center gap-4 p-4" style={{ background: "radial-gradient(circle at 50% 0%, #1a2129 0%, #05010f 70%)" }}>
+    <main className="min-h-screen flex flex-col items-center gap-4 p-4 transition-colors duration-500" style={{ background: `radial-gradient(circle at 50% 0%, ${level.bgTop} 0%, ${level.bgBot} 60%, #05010f 100%)` }}>
       <nav className="w-full max-w-5xl flex items-center justify-between text-sm font-bold tracking-wider">
         <Link to="/" style={{ color: "#e6e6e6" }}>NEON PARKOUR</Link>
         <div className="flex items-center gap-3">
