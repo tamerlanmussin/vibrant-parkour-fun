@@ -7,8 +7,9 @@
 - Vercel framework preset: `tanstack-start`.
 - Vercel install command: `npm ci`.
 - Vercel build command: `npm run build`.
-- Leave Vercel output directory automatic/empty so TanStack Start and Nitro can produce the correct Vercel build output.
-- If Vercel shows `404: NOT_FOUND`, check that the project root is correct, `vercel.json` is committed, and Vercel did not override the framework/output settings with an old static Vite configuration.
+- `npm run build` must leave a Vercel Build Output API directory at `.vercel/output`. The helper script `scripts/prepare-vercel-output.mjs` converts Nitro's `dist/` output into that shape.
+- Leave Vercel output directory automatic/empty so Vercel can detect `.vercel/output`.
+- If Vercel shows `404: NOT_FOUND`, check that the project root is correct, `vercel.json` is committed, Vercel did not override the framework/output settings with an old static Vite configuration, and the build log includes `Prepared Vercel Build Output API`.
 
 ## Environment Safety
 
