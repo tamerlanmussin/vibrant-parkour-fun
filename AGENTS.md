@@ -21,7 +21,7 @@
 ## Supabase
 
 - `SUPABASE_URL` and `VITE_SUPABASE_URL` must be the base project URL, for example `https://PROJECT_REF.supabase.co`; do not append `/rest/v1`.
-- The project ref is the part before `.supabase.co`. The current local Supabase config uses project ref `nujnzfboprgzqsdugtfa`.
+- The project ref is the part before `.supabase.co`. The current local Supabase config uses project ref `gsfqamqanahoqrqqsyop`.
 - `SUPABASE_PUBLISHABLE_KEY` and `VITE_SUPABASE_PUBLISHABLE_KEY` are the same anon/public frontend-safe key.
 - `SUPABASE_SERVICE_ROLE_KEY` is a secret backend/server-only key. Never add it to `VITE_*`, frontend code, `.env.example` with a value, or public copy-paste docs.
 - Only require the service-role key for real backend admin actions that must bypass RLS. Public reads and authenticated user writes should use the anon/public key with RLS policies.
