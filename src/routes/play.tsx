@@ -657,6 +657,12 @@ function Game() {
   const [levelTab, setLevelTab] = useState<"std" | "custom">("std");
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorDraft, setEditorDraft] = useState<Level | null>(null);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [voiceVolume, setVoiceVolume] = useState(0);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const voiceVolumeRef = useRef(0);
+  const voiceCleanupRef = useRef<() => void>(() => {});
+  const voiceThreshold = 0.18;
 
   useEffect(() => { localStorage.setItem("np_custom_levels", JSON.stringify(customLevels)); }, [customLevels]);
 
@@ -800,6 +806,74 @@ function Game() {
     if (levelId === id) setLevelId(1);
   }
 
+  async function startVoiceControl() {
+    if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
+      setVoiceError("Микрофон не поддерживается в этом браузере.");
+      return;
+    }
+
+    setVoiceError(null);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
+      const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!AudioContextClass) throw new Error("Web Audio API не поддерживается.");
+
+      const audioContext = new AudioContextClass();
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 1024;
+      source.connect(analyser);
+
+      const data = new Uint8Array(analyser.fftSize);
+      let raf = 0;
+      let smoothed = 0;
+
+      function tick() {
+        analyser.getByteTimeDomainData(data);
+        let sum = 0;
+        for (const value of data) {
+          const centered = (value - 128) / 128;
+          sum += centered * centered;
+        }
+        const rms = Math.sqrt(sum / data.length);
+        smoothed = smoothed * 0.72 + rms * 0.28;
+        voiceVolumeRef.current = smoothed;
+        setVoiceVolume(smoothed);
+        raf = requestAnimationFrame(tick);
+      }
+
+      voiceCleanupRef.current();
+      setVoiceEnabled(true);
+      tick();
+
+      voiceCleanupRef.current = () => {
+        cancelAnimationFrame(raf);
+        source.disconnect();
+        stream.getTracks().forEach((track) => track.stop());
+        void audioContext.close();
+        voiceVolumeRef.current = 0;
+        setVoiceVolume(0);
+        setVoiceEnabled(false);
+      };
+    } catch (err) {
+      setVoiceEnabled(false);
+      setVoiceError(err instanceof Error ? err.message : "Не удалось включить микрофон.");
+    }
+  }
+
+  function stopVoiceControl() {
+    voiceCleanupRef.current();
+    voiceCleanupRef.current = () => {};
+  }
+
+  useEffect(() => stopVoiceControl, []);
+
   useEffect(() => {
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext("2d")!;
@@ -860,7 +934,8 @@ function Game() {
       else if (keys["ArrowRight"] || keys["KeyD"]) player.vx = Math.min(player.vx + accel, max);
       else player.vx = player.onGround ? 0 : player.vx * 0.9;
 
-      const jumpPressed = keys["Space"] || keys["ArrowUp"] || keys["KeyW"];
+      const voiceJump = voiceEnabled && voiceVolumeRef.current >= voiceThreshold;
+      const jumpPressed = keys["Space"] || keys["ArrowUp"] || keys["KeyW"] || voiceJump;
       if (jumpPressed && !jumpHeld) {
         if (player.onWall !== 0) { player.vy = -11; player.vx = -player.onWall * 5.5; player.jumps = 1; }
         else if (player.jumps > 0) { player.vy = -11; player.jumps--; }
@@ -1017,6 +1092,38 @@ function Game() {
         <h1 className="text-4xl md:text-5xl font-black tracking-tighter" style={{ color: "#ffffff" }}>NEON PARKOUR</h1>
         <p className="text-sm md:text-base mt-1" style={{ color: "#6b6b6b" }}>{level.name} · ЦЕЛЬ: {level.target < 9999 ? level.target : "∞"}</p>
       </header>
+
+      <section className="w-full max-w-5xl p-3 font-mono" style={{ background: "rgba(26,33,41,0.7)", border: "1px solid #22e6ff" }}>
+        <div className="flex flex-col md:flex-row md:items-center gap-3">
+          <button
+            type="button"
+            onClick={voiceEnabled ? stopVoiceControl : startVoiceControl}
+            className="px-4 py-2 text-xs font-black tracking-wider uppercase border transition-colors"
+            style={{
+              background: voiceEnabled ? "#22e6ff" : "transparent",
+              borderColor: "#22e6ff",
+              color: voiceEnabled ? "#0a0a0a" : "#22e6ff",
+            }}
+          >
+            {voiceEnabled ? "ГОЛОС ВКЛ" : "ВКЛЮЧИТЬ ГОЛОС"}
+          </button>
+          <div className="flex-1">
+            <div className="h-3 w-full" style={{ background: "rgba(255,255,255,0.12)" }}>
+              <div
+                className="h-full transition-all"
+                style={{
+                  width: `${Math.min(100, Math.round(voiceVolume * 360))}%`,
+                  background: voiceVolume >= voiceThreshold ? "#fffb00" : "#22e6ff",
+                }}
+              />
+            </div>
+            <div className="mt-1 flex justify-between gap-3 text-[10px]" style={{ color: voiceError ? "#e22718" : "#6b6b6b" }}>
+              <span>{voiceError ?? "Громко скажи звук - персонаж прыгнет"}</span>
+              <span>{Math.round(voiceVolume * 100)}%</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <div className="flex flex-col lg:flex-row gap-4 items-start justify-center w-full max-w-6xl">
         {/* Left: levels */}
