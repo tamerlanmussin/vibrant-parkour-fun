@@ -925,6 +925,8 @@ function Game() {
     seedWorld();
 
     let jumpHeld = false;
+    const jumpPower = 13.5;
+    const wallJumpPower = 13;
     function update() {
       if (!alive || finished) return;
       const L = levelRef.current;
@@ -937,8 +939,8 @@ function Game() {
       const voiceJump = voiceEnabled && voiceVolumeRef.current >= voiceThreshold;
       const jumpPressed = keys["Space"] || keys["ArrowUp"] || keys["KeyW"] || voiceJump;
       if (jumpPressed && !jumpHeld) {
-        if (player.onWall !== 0) { player.vy = -11; player.vx = -player.onWall * 5.5; player.jumps = 1; }
-        else if (player.jumps > 0) { player.vy = -11; player.jumps--; }
+        if (player.onWall !== 0) { player.vy = -wallJumpPower; player.vx = -player.onWall * 6.2; player.jumps = 1; }
+        else if (player.jumps > 0) { player.vy = -jumpPower; player.jumps--; }
       }
       jumpHeld = jumpPressed;
 
