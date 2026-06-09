@@ -937,7 +937,8 @@ function Game() {
       else player.vx = player.onGround ? 0 : player.vx * 0.9;
 
       const voiceJump = voiceEnabled && voiceVolumeRef.current >= voiceThreshold;
-      const jumpPressed = keys["Space"] || keys["ArrowUp"] || keys["KeyW"] || voiceJump;
+      const keyboardJump = !voiceEnabled && (keys["Space"] || keys["ArrowUp"] || keys["KeyW"]);
+      const jumpPressed = keyboardJump || voiceJump;
       if (jumpPressed && !jumpHeld) {
         if (player.onWall !== 0) { player.vy = -wallJumpPower; player.vx = -player.onWall * 6.2; player.jumps = 1; }
         else if (player.jumps > 0) { player.vy = -jumpPower; player.jumps--; }
