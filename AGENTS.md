@@ -28,6 +28,17 @@
 - Only require the service-role key for real backend admin actions that must bypass RLS. Public reads and authenticated user writes should use the anon/public key with RLS policies.
 - Migrations are SQL files that create or update Supabase tables. Apply files in `supabase/migrations` to the target Supabase project before deploying if the app reads those tables.
 
+## Supabase Auth
+
+- Use Supabase Auth only for registration, login, OAuth, and logout.
+- Never create a custom passwords table and never store password values manually.
+- Email/password auth uses `supabase.auth.signUp` and `supabase.auth.signInWithPassword`.
+- Google auth uses `supabase.auth.signInWithOAuth({ provider: "google" })`.
+- Logout uses `supabase.auth.signOut`.
+- In Supabase Dashboard -> Authentication -> Providers -> Email, turn off `Confirm email` if students need registration to work without email confirmation.
+- In Supabase Dashboard -> Authentication -> Providers -> Google, enable Google and configure the Google OAuth Client ID/Secret using the Supabase Callback URL.
+- In Supabase Dashboard -> Authentication -> URL Configuration, add local, production, and preview URLs before testing OAuth redirects.
+
 ## Gemini
 
 - `GEMINI_API_KEY` is secret backend/server-only and must never use `VITE_*`.
