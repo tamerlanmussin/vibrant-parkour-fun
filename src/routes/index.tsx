@@ -113,12 +113,8 @@ function MainMenu() {
       <div className="absolute left-[-6vw] top-[42vh] h-2 w-[122vw] rotate-[-38deg] bg-white shadow-[0_0_0_4px_#b8c3d1,0_0_18px_#ffffff]" />
       <div className="absolute left-[56vw] top-[43vh] h-2 w-[44vw] rotate-[42deg] bg-white shadow-[0_0_0_4px_#b8c3d1,0_0_18px_#ffffff]" />
 
-      <nav className="relative z-10 flex items-center justify-between px-4 py-4 md:px-8">
+      <nav className="relative z-10 flex items-center px-4 py-4 md:px-8">
         <Link to="/auth" className="border-4 px-4 py-2 text-xs font-black uppercase shadow-[4px_4px_0_#000]" style={{ borderColor: "#ffffff", background: "#1c69d4", color: "#ffffff" }}>LOGIN</Link>
-        <div className="flex gap-3">
-          <button className="h-12 w-12 border-4 text-xl font-black shadow-[4px_4px_0_#000]" style={{ borderColor: "#ffffff", background: "#92e329", color: "#22570c" }}>?</button>
-          <button className="h-12 w-12 border-4 text-xl font-black shadow-[4px_4px_0_#000]" style={{ borderColor: "#ffffff", background: "#92e329", color: "#22570c" }}>i</button>
-        </div>
       </nav>
 
       <section className="relative z-10 mx-auto flex min-h-[68vh] max-w-6xl flex-col items-center justify-center px-4 text-center">
