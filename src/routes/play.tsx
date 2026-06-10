@@ -560,7 +560,6 @@ function Game() {
     } catch {}
     return [];
   });
-  const [levelTab, setLevelTab] = useState<"std" | "custom">("std");
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorDraft, setEditorDraft] = useState<Level | null>(null);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
@@ -1054,7 +1053,7 @@ function Game() {
               </div>
             </div>
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
-              <button onClick={() => setGameView("play")} className="py-4 text-sm font-black tracking-wider uppercase transition-transform hover:scale-[1.02]" style={{ background: level.ground, color: "#ffffff" }}>PLAY</button>
+              <button onClick={() => setGameView("levels")} className="py-4 text-sm font-black tracking-wider uppercase transition-transform hover:scale-[1.02]" style={{ background: level.ground, color: "#ffffff" }}>PLAY</button>
               <button onClick={() => setGameView("levels")} className="py-4 text-sm font-black tracking-wider uppercase border transition-transform hover:scale-[1.02]" style={{ borderColor: "#1c69d4", color: "#1c69d4" }}>LEVELS</button>
               <button onClick={() => setGameView("skins")} className="py-4 text-sm font-black tracking-wider uppercase border transition-transform hover:scale-[1.02]" style={{ borderColor: "#facc15", color: "#facc15" }}>SKINS</button>
             </div>
@@ -1088,14 +1087,47 @@ function Game() {
       )}
 
       {gameView === "levels" && (
-        <section className="w-full max-w-5xl p-4 md:p-5 font-mono" style={{ background: "rgba(26,33,41,0.76)", border: "1px solid #1c69d4" }}>
-          <div className="flex flex-wrap gap-2 mb-4">
-            <button onClick={() => setLevelTab("std")} className="px-4 py-2 text-xs font-black tracking-wider uppercase border" style={{ background: levelTab === "std" ? "#1c69d4" : "transparent", color: levelTab === "std" ? "#fff" : "#1c69d4", borderColor: "#1c69d4" }}>STANDARD</button>
-            <button onClick={() => setLevelTab("custom")} className="px-4 py-2 text-xs font-black tracking-wider uppercase border" style={{ background: levelTab === "custom" ? "#22e6ff" : "transparent", color: levelTab === "custom" ? "#0a0a0a" : "#22e6ff", borderColor: "#22e6ff" }}>CUSTOM</button>
-          </div>
+        <section className="w-full max-w-7xl grid gap-4 lg:grid-cols-[220px_1fr_260px] font-mono">
+          <aside className="p-4" style={{ background: "rgba(26,33,41,0.76)", border: "1px solid #facc15" }}>
+            <h2 className="text-sm font-black mb-3 tracking-wider" style={{ color: "#facc15" }}>SKINS</h2>
+            <div className="mb-3 flex items-center gap-3 border p-2" style={{ borderColor: "#3a4250", background: "rgba(0,0,0,0.25)" }}>
+              <div className="h-14 w-14 flex items-center justify-center border" style={{ borderColor: "#facc15" }}>
+                <ShapeSwatch shape={skin.shape} body={skin.body} stroke={skin.stroke} />
+              </div>
+              <div className="min-w-0 text-[10px]" style={{ color: skin.body }}>{skin.name}</div>
+            </div>
+            <div className="grid grid-cols-4 gap-2 max-h-[420px] overflow-y-auto pr-1">
+              {SKINS.map((s) => {
+                const isOwned = owned.includes(s.id);
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => isOwned && setSkinId(s.id)}
+                    disabled={!isOwned}
+                    title={isOwned ? s.name : "Locked"}
+                    className="aspect-square flex items-center justify-center border-2 transition-transform hover:scale-105 disabled:cursor-not-allowed"
+                    style={{
+                      background: "rgba(0,0,0,0.3)",
+                      borderColor: skinId === s.id ? "#ffffff" : "#3a4250",
+                      outline: skinId === s.id ? "2px solid #facc15" : "none",
+                      outlineOffset: "1px",
+                      opacity: isOwned ? 1 : 0.22,
+                      filter: isOwned ? "none" : "grayscale(1)",
+                    }}
+                  >
+                    {isOwned ? <ShapeSwatch shape={s.shape} body={s.body} stroke={s.stroke} /> : <span className="text-[9px]">LOCK</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </aside>
 
-          {levelTab === "std" ? (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="p-4 md:p-5" style={{ background: "rgba(26,33,41,0.76)", border: "1px solid #1c69d4" }}>
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h2 className="text-sm font-black tracking-wider" style={{ color: "#1c69d4" }}>LEVELS</h2>
+              <div className="text-[10px]" style={{ color: "#6b6b6b" }}>Tap a level to start</div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               {LEVELS.map((l) => {
                 const isLocked = l.id > unlocked;
                 const active = l.id === levelId;
@@ -1107,10 +1139,13 @@ function Game() {
                 );
               })}
             </div>
-          ) : (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              <button onClick={openCreateEditor} className="min-h-28 p-3 text-sm font-black tracking-wider uppercase border-2 border-dashed transition-colors hover:bg-[#22e6ff] hover:text-[#0a0a0a]" style={{ borderColor: "#22e6ff", color: "#22e6ff" }}>+ CREATE LEVEL</button>
-              {customLevels.length === 0 && <p className="text-xs self-center" style={{ color: "#6b6b6b" }}>Create your own level: speed, colors, theme, and goal.</p>}
+          </div>
+
+          <aside className="p-4" style={{ background: "rgba(26,33,41,0.76)", border: "1px solid #22e6ff" }}>
+            <h2 className="text-sm font-black mb-3 tracking-wider" style={{ color: "#22e6ff" }}>CREATE LEVELS</h2>
+            <button onClick={openCreateEditor} className="mb-3 min-h-24 w-full p-3 text-sm font-black tracking-wider uppercase border-2 border-dashed transition-colors hover:bg-[#22e6ff] hover:text-[#0a0a0a]" style={{ borderColor: "#22e6ff", color: "#22e6ff" }}>+ CREATE LEVEL</button>
+            <div className="flex flex-col gap-3 max-h-[500px] overflow-y-auto pr-1">
+              {customLevels.length === 0 && <p className="text-xs" style={{ color: "#6b6b6b" }}>Create your own level: speed, colors, theme, and goal.</p>}
               {customLevels.map((l) => {
                 const active = l.id === levelId;
                 return (
@@ -1121,7 +1156,7 @@ function Game() {
                 );
               })}
             </div>
-          )}
+          </aside>
         </section>
       )}
 
