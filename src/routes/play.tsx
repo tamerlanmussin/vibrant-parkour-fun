@@ -1026,77 +1026,21 @@ function Game() {
         <div className={`font-mono ${gameView === "play" ? "fixed left-3 top-3 z-20 flex flex-wrap items-center gap-2" : "w-full max-w-5xl flex flex-wrap items-center justify-center gap-2"}`}>
           <button onClick={() => setGameView("menu")} className="px-4 py-2 text-xs font-black tracking-wider uppercase border" style={{ borderColor: "#6b6b6b", color: "#e6e6e6" }}>MENU</button>
           <button onClick={() => setGameView("levels")} className="px-4 py-2 text-xs font-black tracking-wider uppercase border" style={{ borderColor: "#1c69d4", color: gameView === "levels" ? "#ffffff" : "#1c69d4", background: gameView === "levels" ? "#1c69d4" : "transparent" }}>LEVELS</button>
-          <button onClick={() => setGameView("skins")} className="px-4 py-2 text-xs font-black tracking-wider uppercase border" style={{ borderColor: "#facc15", color: gameView === "skins" ? "#0a0a0a" : "#facc15", background: gameView === "skins" ? "#facc15" : "transparent" }}>SKINS</button>
           <button onClick={() => setGameView("play")} className="px-5 py-2 text-xs font-black tracking-wider uppercase" style={{ background: level.ground, color: "#ffffff" }}>PLAY</button>
         </div>
       )}
 
       {gameView === "menu" && (
-        <section className="w-full max-w-5xl grid gap-4 md:grid-cols-[1.2fr_0.8fr] items-stretch font-mono">
-          <div className="p-5 md:p-8 flex flex-col justify-between min-h-[360px]" style={{ background: "rgba(26,33,41,0.76)", border: "2px solid " + level.ground }}>
-            <div>
-              <div className="text-[10px] font-black tracking-[0.35em] uppercase mb-3" style={{ color: level.ground }}>SELECTED LEVEL</div>
-              <h2 className="text-3xl md:text-5xl font-black tracking-tighter leading-none" style={{ color: "#ffffff" }}>{shortLevelName}</h2>
-              <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                <div className="border p-3" style={{ borderColor: "#3a4250" }}>
-                  <div className="text-[10px]" style={{ color: "#6b6b6b" }}>GOAL</div>
-                  <div className="text-lg font-black" style={{ color: level.ground }}>{level.target < 9999 ? level.target : "INF"}</div>
-                </div>
-                <div className="border p-3" style={{ borderColor: "#3a4250" }}>
-                  <div className="text-[10px]" style={{ color: "#6b6b6b" }}>BEST</div>
-                  <div className="text-lg font-black" style={{ color: level.wall }}>{best}</div>
-                </div>
-                <div className="border p-3" style={{ borderColor: "#3a4250" }}>
-                  <div className="text-[10px]" style={{ color: "#6b6b6b" }}>SKINS</div>
-                  <div className="text-lg font-black" style={{ color: "#facc15" }}>{owned.length}</div>
-                </div>
-              </div>
-            </div>
-            <div className="mt-6 grid gap-3 sm:grid-cols-3">
-              <button onClick={() => setGameView("levels")} className="py-4 text-sm font-black tracking-wider uppercase transition-transform hover:scale-[1.02]" style={{ background: level.ground, color: "#ffffff" }}>PLAY</button>
-              <button onClick={() => setGameView("levels")} className="py-4 text-sm font-black tracking-wider uppercase border transition-transform hover:scale-[1.02]" style={{ borderColor: "#1c69d4", color: "#1c69d4" }}>LEVELS</button>
-              <button onClick={() => setGameView("skins")} className="py-4 text-sm font-black tracking-wider uppercase border transition-transform hover:scale-[1.02]" style={{ borderColor: "#facc15", color: "#facc15" }}>SKINS</button>
-            </div>
-          </div>
-
-          <aside className="p-5 flex flex-col gap-4" style={{ background: "rgba(26,33,41,0.76)", border: "1px solid #3a4250" }}>
-            <div>
-              <div className="text-[10px] font-black tracking-[0.25em] uppercase mb-2" style={{ color: "#facc15" }}>PLAYER</div>
-              <div className="w-24 h-24 flex items-center justify-center border-2" style={{ borderColor: "#facc15", background: "rgba(0,0,0,0.35)" }}>
-                <ShapeSwatch shape={skin.shape} body={skin.body} stroke={skin.stroke} />
-              </div>
-              <div className="mt-2 text-xs" style={{ color: skin.body }}>{skin.name}</div>
-            </div>
-            <div className="border-t pt-4" style={{ borderColor: "#3a4250" }}>
-              <div className="text-[10px] font-black tracking-[0.25em] uppercase mb-2" style={{ color: "#1c69d4" }}>TOP-10</div>
-              {leaders.length === 0 ? (
-                <p className="text-xs" style={{ color: "#6b6b6b" }}>No scores yet.</p>
-              ) : (
-                <ol className="flex flex-col gap-1.5 text-xs">
-                  {leaders.slice(0, 5).map((l, i) => (
-                    <li key={i} className="flex items-center justify-between gap-2">
-                      <span style={{ color: i === 0 ? "#ffffff" : "#6b6b6b" }}>{String(i + 1).padStart(2, "0")}. {l.username}</span>
-                      <span style={{ color: "#e22718" }}>{l.best_score}</span>
-                    </li>
-                  ))}
-                </ol>
-              )}
-            </div>
-          </aside>
-        </section>
-      )}
-
-      {gameView === "levels" && (
-        <section className="w-full max-w-7xl grid gap-4 lg:grid-cols-[220px_1fr_260px] font-mono">
+        <section className="w-full max-w-7xl grid gap-4 lg:grid-cols-[260px_1fr_260px] items-stretch font-mono">
           <aside className="p-4" style={{ background: "rgba(26,33,41,0.76)", border: "1px solid #facc15" }}>
             <h2 className="text-sm font-black mb-3 tracking-wider" style={{ color: "#facc15" }}>SKINS</h2>
             <div className="mb-3 flex items-center gap-3 border p-2" style={{ borderColor: "#3a4250", background: "rgba(0,0,0,0.25)" }}>
-              <div className="h-14 w-14 flex items-center justify-center border" style={{ borderColor: "#facc15" }}>
+              <div className="h-16 w-16 flex items-center justify-center border" style={{ borderColor: "#facc15" }}>
                 <ShapeSwatch shape={skin.shape} body={skin.body} stroke={skin.stroke} />
               </div>
               <div className="min-w-0 text-[10px]" style={{ color: skin.body }}>{skin.name}</div>
             </div>
-            <div className="grid grid-cols-4 gap-2 max-h-[420px] overflow-y-auto pr-1">
+            <div className="grid grid-cols-4 gap-2 max-h-[360px] overflow-y-auto pr-1">
               {SKINS.map((s) => {
                 const isOwned = owned.includes(s.id);
                 return (
@@ -1122,12 +1066,58 @@ function Game() {
             </div>
           </aside>
 
+          <div className="p-5 md:p-8 flex flex-col justify-between min-h-[420px]" style={{ background: "rgba(26,33,41,0.76)", border: "2px solid " + level.ground }}>
+            <div>
+              <div className="text-[10px] font-black tracking-[0.35em] uppercase mb-3" style={{ color: level.ground }}>SELECTED LEVEL</div>
+              <h2 className="text-3xl md:text-5xl font-black tracking-tighter leading-none" style={{ color: "#ffffff" }}>{shortLevelName}</h2>
+              <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                <div className="border p-3" style={{ borderColor: "#3a4250" }}>
+                  <div className="text-[10px]" style={{ color: "#6b6b6b" }}>GOAL</div>
+                  <div className="text-lg font-black" style={{ color: level.ground }}>{level.target < 9999 ? level.target : "INF"}</div>
+                </div>
+                <div className="border p-3" style={{ borderColor: "#3a4250" }}>
+                  <div className="text-[10px]" style={{ color: "#6b6b6b" }}>BEST</div>
+                  <div className="text-lg font-black" style={{ color: level.wall }}>{best}</div>
+                </div>
+                <div className="border p-3" style={{ borderColor: "#3a4250" }}>
+                  <div className="text-[10px]" style={{ color: "#6b6b6b" }}>SKINS</div>
+                  <div className="text-lg font-black" style={{ color: "#facc15" }}>{owned.length}</div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <button onClick={() => setGameView("levels")} className="py-4 text-sm font-black tracking-wider uppercase transition-transform hover:scale-[1.02]" style={{ background: level.ground, color: "#ffffff" }}>PLAY</button>
+              <button onClick={() => setGameView("levels")} className="py-4 text-sm font-black tracking-wider uppercase border transition-transform hover:scale-[1.02]" style={{ borderColor: "#1c69d4", color: "#1c69d4" }}>LEVELS</button>
+            </div>
+          </div>
+
+          <aside className="p-4" style={{ background: "rgba(26,33,41,0.76)", border: "1px solid #22e6ff" }}>
+            <h2 className="text-sm font-black mb-3 tracking-wider" style={{ color: "#22e6ff" }}>CREATE</h2>
+            <button onClick={openCreateEditor} className="mb-3 min-h-24 w-full p-3 text-sm font-black tracking-wider uppercase border-2 border-dashed transition-colors hover:bg-[#22e6ff] hover:text-[#0a0a0a]" style={{ borderColor: "#22e6ff", color: "#22e6ff" }}>+ CREATE LEVEL</button>
+            <div className="flex flex-col gap-3 max-h-[360px] overflow-y-auto pr-1">
+              {customLevels.length === 0 && <p className="text-xs" style={{ color: "#6b6b6b" }}>Your created levels will be here.</p>}
+              {customLevels.map((l) => {
+                const active = l.id === levelId;
+                return (
+                  <div key={l.id} className="border p-3" style={{ background: active ? l.ground : "rgba(0,0,0,0.22)", borderColor: active ? l.ground : "#3a4250" }}>
+                    <button onClick={() => pickLevel(l.id)} className="text-left w-full text-sm font-black uppercase" style={{ color: active ? "#ffffff" : "#e6e6e6" }}><div className="flex items-center justify-between gap-2"><span>{l.name.slice(0, 22)}</span><span style={{ color: active ? "#ffffff" : l.ground }}>{l.target}</span></div></button>
+                    <div className="flex gap-2 mt-3"><button onClick={() => openEditEditor(l)} className="flex-1 py-1 text-[10px] border" style={{ borderColor: "#facc15", color: active ? "#fff" : "#facc15" }}>EDIT</button><button onClick={() => deleteCustom(l.id)} className="flex-1 py-1 text-[10px] border" style={{ borderColor: "#e22718", color: active ? "#fff" : "#e22718" }}>DELETE</button></div>
+                  </div>
+                );
+              })}
+            </div>
+          </aside>
+        </section>
+      )}
+
+      {gameView === "levels" && (
+        <section className="w-full max-w-5xl font-mono">
           <div className="p-4 md:p-5" style={{ background: "rgba(26,33,41,0.76)", border: "1px solid #1c69d4" }}>
             <div className="mb-4 flex items-center justify-between gap-3">
               <h2 className="text-sm font-black tracking-wider" style={{ color: "#1c69d4" }}>LEVELS</h2>
               <div className="text-[10px]" style={{ color: "#6b6b6b" }}>Tap a level to start</div>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {LEVELS.map((l) => {
                 const isLocked = l.id > unlocked;
                 const active = l.id === levelId;
@@ -1140,23 +1130,6 @@ function Game() {
               })}
             </div>
           </div>
-
-          <aside className="p-4" style={{ background: "rgba(26,33,41,0.76)", border: "1px solid #22e6ff" }}>
-            <h2 className="text-sm font-black mb-3 tracking-wider" style={{ color: "#22e6ff" }}>CREATE LEVELS</h2>
-            <button onClick={openCreateEditor} className="mb-3 min-h-24 w-full p-3 text-sm font-black tracking-wider uppercase border-2 border-dashed transition-colors hover:bg-[#22e6ff] hover:text-[#0a0a0a]" style={{ borderColor: "#22e6ff", color: "#22e6ff" }}>+ CREATE LEVEL</button>
-            <div className="flex flex-col gap-3 max-h-[500px] overflow-y-auto pr-1">
-              {customLevels.length === 0 && <p className="text-xs" style={{ color: "#6b6b6b" }}>Create your own level: speed, colors, theme, and goal.</p>}
-              {customLevels.map((l) => {
-                const active = l.id === levelId;
-                return (
-                  <div key={l.id} className="border p-3" style={{ background: active ? l.ground : "rgba(0,0,0,0.22)", borderColor: active ? l.ground : "#3a4250" }}>
-                    <button onClick={() => pickLevel(l.id)} className="text-left w-full text-sm font-black uppercase" style={{ color: active ? "#ffffff" : "#e6e6e6" }}><div className="flex items-center justify-between gap-2"><span>{l.name.slice(0, 22)}</span><span style={{ color: active ? "#ffffff" : l.ground }}>{l.target}</span></div></button>
-                    <div className="flex gap-2 mt-3"><button onClick={() => openEditEditor(l)} className="flex-1 py-1 text-[10px] border" style={{ borderColor: "#facc15", color: active ? "#fff" : "#facc15" }}>EDIT</button><button onClick={() => deleteCustom(l.id)} className="flex-1 py-1 text-[10px] border" style={{ borderColor: "#e22718", color: active ? "#fff" : "#e22718" }}>DELETE</button></div>
-                  </div>
-                );
-              })}
-            </div>
-          </aside>
         </section>
       )}
 
