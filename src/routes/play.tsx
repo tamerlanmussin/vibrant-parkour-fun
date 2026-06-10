@@ -520,6 +520,7 @@ function Game() {
   const [leaders, setLeaders] = useState<LeaderRow[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [showRules, setShowRules] = useState(false);
+  const [gameView, setGameView] = useState<"menu" | "levels" | "skins" | "play">("menu");
 
   const DEFAULT_OWNED = useMemo(
     () => SKINS.filter((s) => s.shape === "square" && ["БЕЛЫЙ", "СИНИЙ", "КРАСНЫЙ"].some((n) => s.name.endsWith(n))).map((s) => s.id),
@@ -780,8 +781,11 @@ function Game() {
   useEffect(() => stopVoiceControl, []);
 
   useEffect(() => {
-    const canvas = canvasRef.current!;
-    const ctx = canvas.getContext("2d")!;
+    if (gameView !== "play") return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
     const W = (canvas.width = 960);
     const H = (canvas.height = 540);
 
@@ -956,18 +960,21 @@ function Game() {
       window.removeEventListener("keydown", kd);
       window.removeEventListener("keyup", ku);
     };
-  }, [levelId]); // restart loop when changing level
+  }, [levelId, gameView]); // restart loop when changing level or entering play
 
   function pickLevel(id: number) {
     if (id > unlocked) return;
     setLevelId(id);
     setDead(false); setWon(false); setScore(0);
     lastSubmittedRef.current = -1;
+    setGameView("play");
   }
   function nextLevel() {
     const next = Math.min(LEVELS.length, level.id + 1);
     pickLevel(next);
   }
+
+  const shortLevelName = level.name.includes("\u00b7") ? level.name.split("\u00b7").pop()!.trim() : level.name;
 
   return (
     <main className="min-h-screen flex flex-col items-center gap-4 p-4 transition-colors duration-500" style={{ background: `radial-gradient(circle at 50% 0%, ${level.bgTop} 0%, ${level.bgBot} 60%, #05010f 100%)` }}>
@@ -1006,247 +1013,166 @@ function Game() {
 
       <header className="text-center">
         <h1 className="text-4xl md:text-5xl font-black tracking-tighter" style={{ color: "#ffffff" }}>NEON PARKOUR</h1>
-        <p className="text-sm md:text-base mt-1" style={{ color: "#6b6b6b" }}>{level.name} · ЦЕЛЬ: {level.target < 9999 ? level.target : "∞"}</p>
+        <p className="text-sm md:text-base mt-1" style={{ color: "#6b6b6b" }}>{level.name} - GOAL: {level.target < 9999 ? level.target : "INF"}</p>
       </header>
 
-      <section className="w-full max-w-5xl p-3 font-mono" style={{ background: "rgba(26,33,41,0.7)", border: "1px solid #22e6ff" }}>
-        <div className="flex flex-col md:flex-row md:items-center gap-3">
-          <button
-            type="button"
-            onClick={voiceEnabled ? stopVoiceControl : startVoiceControl}
-            className="px-4 py-2 text-xs font-black tracking-wider uppercase border transition-colors"
-            style={{
-              background: voiceEnabled ? "#22e6ff" : "transparent",
-              borderColor: "#22e6ff",
-              color: voiceEnabled ? "#0a0a0a" : "#22e6ff",
-            }}
-          >
-            {voiceEnabled ? "ГОЛОС ВКЛ" : "ВКЛЮЧИТЬ ГОЛОС"}
-          </button>
-          <div className="flex-1">
-            <div className="h-3 w-full" style={{ background: "rgba(255,255,255,0.12)" }}>
-              <div
-                className="h-full transition-all"
-                style={{
-                  width: `${Math.min(100, Math.round(voiceVolume * 360))}%`,
-                  background: voiceVolume >= voiceThreshold ? "#fffb00" : "#22e6ff",
-                }}
-              />
-            </div>
-            <div className="mt-1 flex justify-between gap-3 text-[10px]" style={{ color: voiceError ? "#e22718" : "#6b6b6b" }}>
-              <span>{voiceError ?? "Громко скажи звук - персонаж прыгнет"}</span>
-              <span>{Math.round(voiceVolume * 100)}%</span>
-            </div>
-          </div>
+      {gameView !== "menu" && (
+        <div className="w-full max-w-5xl flex flex-wrap items-center justify-center gap-2 font-mono">
+          <button onClick={() => setGameView("menu")} className="px-4 py-2 text-xs font-black tracking-wider uppercase border" style={{ borderColor: "#6b6b6b", color: "#e6e6e6" }}>MENU</button>
+          <button onClick={() => setGameView("levels")} className="px-4 py-2 text-xs font-black tracking-wider uppercase border" style={{ borderColor: "#1c69d4", color: gameView === "levels" ? "#ffffff" : "#1c69d4", background: gameView === "levels" ? "#1c69d4" : "transparent" }}>LEVELS</button>
+          <button onClick={() => setGameView("skins")} className="px-4 py-2 text-xs font-black tracking-wider uppercase border" style={{ borderColor: "#facc15", color: gameView === "skins" ? "#0a0a0a" : "#facc15", background: gameView === "skins" ? "#facc15" : "transparent" }}>SKINS</button>
+          <button onClick={() => setGameView("play")} className="px-5 py-2 text-xs font-black tracking-wider uppercase" style={{ background: level.ground, color: "#ffffff" }}>PLAY</button>
         </div>
-      </section>
+      )}
 
-      <div className="flex flex-col lg:flex-row gap-4 items-start justify-center w-full max-w-6xl">
-        {/* Left: levels */}
-        <aside className="w-full lg:w-56 p-4 font-mono" style={{ background: "rgba(26,33,41,0.7)", border: "1px solid #1c69d4" }}>
-          <div className="flex gap-1 mb-3">
-            <button
-              onClick={() => setLevelTab("std")}
-              className="flex-1 py-1 text-[10px] font-black tracking-wider border"
-              style={{
-                background: levelTab === "std" ? "#1c69d4" : "transparent",
-                color: levelTab === "std" ? "#fff" : "#1c69d4",
-                borderColor: "#1c69d4",
-              }}
-            >УРОВНИ</button>
-            <button
-              onClick={() => setLevelTab("custom")}
-              className="flex-1 py-1 text-[10px] font-black tracking-wider border"
-              style={{
-                background: levelTab === "custom" ? "#22e6ff" : "transparent",
-                color: levelTab === "custom" ? "#0a0a0a" : "#22e6ff",
-                borderColor: "#22e6ff",
-              }}
-            >СВОИ</button>
+      {gameView === "menu" && (
+        <section className="w-full max-w-5xl grid gap-4 md:grid-cols-[1.2fr_0.8fr] items-stretch font-mono">
+          <div className="p-5 md:p-8 flex flex-col justify-between min-h-[360px]" style={{ background: "rgba(26,33,41,0.76)", border: "2px solid " + level.ground }}>
+            <div>
+              <div className="text-[10px] font-black tracking-[0.35em] uppercase mb-3" style={{ color: level.ground }}>SELECTED LEVEL</div>
+              <h2 className="text-3xl md:text-5xl font-black tracking-tighter leading-none" style={{ color: "#ffffff" }}>{shortLevelName}</h2>
+              <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                <div className="border p-3" style={{ borderColor: "#3a4250" }}>
+                  <div className="text-[10px]" style={{ color: "#6b6b6b" }}>GOAL</div>
+                  <div className="text-lg font-black" style={{ color: level.ground }}>{level.target < 9999 ? level.target : "INF"}</div>
+                </div>
+                <div className="border p-3" style={{ borderColor: "#3a4250" }}>
+                  <div className="text-[10px]" style={{ color: "#6b6b6b" }}>BEST</div>
+                  <div className="text-lg font-black" style={{ color: level.wall }}>{best}</div>
+                </div>
+                <div className="border p-3" style={{ borderColor: "#3a4250" }}>
+                  <div className="text-[10px]" style={{ color: "#6b6b6b" }}>SKINS</div>
+                  <div className="text-lg font-black" style={{ color: "#facc15" }}>{owned.length}</div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <button onClick={() => setGameView("play")} className="py-4 text-sm font-black tracking-wider uppercase transition-transform hover:scale-[1.02]" style={{ background: level.ground, color: "#ffffff" }}>PLAY</button>
+              <button onClick={() => setGameView("levels")} className="py-4 text-sm font-black tracking-wider uppercase border transition-transform hover:scale-[1.02]" style={{ borderColor: "#1c69d4", color: "#1c69d4" }}>LEVELS</button>
+              <button onClick={() => setGameView("skins")} className="py-4 text-sm font-black tracking-wider uppercase border transition-transform hover:scale-[1.02]" style={{ borderColor: "#facc15", color: "#facc15" }}>SKINS</button>
+            </div>
           </div>
+
+          <aside className="p-5 flex flex-col gap-4" style={{ background: "rgba(26,33,41,0.76)", border: "1px solid #3a4250" }}>
+            <div>
+              <div className="text-[10px] font-black tracking-[0.25em] uppercase mb-2" style={{ color: "#facc15" }}>PLAYER</div>
+              <div className="w-24 h-24 flex items-center justify-center border-2" style={{ borderColor: "#facc15", background: "rgba(0,0,0,0.35)" }}>
+                <ShapeSwatch shape={skin.shape} body={skin.body} stroke={skin.stroke} />
+              </div>
+              <div className="mt-2 text-xs" style={{ color: skin.body }}>{skin.name}</div>
+            </div>
+            <div className="border-t pt-4" style={{ borderColor: "#3a4250" }}>
+              <div className="text-[10px] font-black tracking-[0.25em] uppercase mb-2" style={{ color: "#1c69d4" }}>TOP-10</div>
+              {leaders.length === 0 ? (
+                <p className="text-xs" style={{ color: "#6b6b6b" }}>No scores yet.</p>
+              ) : (
+                <ol className="flex flex-col gap-1.5 text-xs">
+                  {leaders.slice(0, 5).map((l, i) => (
+                    <li key={i} className="flex items-center justify-between gap-2">
+                      <span style={{ color: i === 0 ? "#ffffff" : "#6b6b6b" }}>{String(i + 1).padStart(2, "0")}. {l.username}</span>
+                      <span style={{ color: "#e22718" }}>{l.best_score}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
+          </aside>
+        </section>
+      )}
+
+      {gameView === "levels" && (
+        <section className="w-full max-w-5xl p-4 md:p-5 font-mono" style={{ background: "rgba(26,33,41,0.76)", border: "1px solid #1c69d4" }}>
+          <div className="flex flex-wrap gap-2 mb-4">
+            <button onClick={() => setLevelTab("std")} className="px-4 py-2 text-xs font-black tracking-wider uppercase border" style={{ background: levelTab === "std" ? "#1c69d4" : "transparent", color: levelTab === "std" ? "#fff" : "#1c69d4", borderColor: "#1c69d4" }}>STANDARD</button>
+            <button onClick={() => setLevelTab("custom")} className="px-4 py-2 text-xs font-black tracking-wider uppercase border" style={{ background: levelTab === "custom" ? "#22e6ff" : "transparent", color: levelTab === "custom" ? "#0a0a0a" : "#22e6ff", borderColor: "#22e6ff" }}>CUSTOM</button>
+          </div>
+
           {levelTab === "std" ? (
-            <div className="flex flex-col gap-2">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {LEVELS.map((l) => {
                 const isLocked = l.id > unlocked;
                 const active = l.id === levelId;
                 return (
-                  <button
-                    key={l.id}
-                    onClick={() => pickLevel(l.id)}
-                    disabled={isLocked}
-                    className="text-left px-3 py-2 text-xs tracking-wider border transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                    style={{
-                      background: active ? l.ground : "transparent",
-                      color: active ? "#ffffff" : isLocked ? "#6b6b6b" : "#e6e6e6",
-                      borderColor: active ? l.ground : "#3a4250",
-                    }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span>{String(l.id).padStart(2, "0")} {isLocked && "🔒"}</span>
-                      <span style={{ color: active ? "#ffffff" : l.ground }}>{l.target < 9999 ? l.target : "∞"}</span>
-                    </div>
-                    <div className="text-[10px] opacity-70 mt-0.5 truncate">{l.name.replace(/^ТРАССА \d+ · /, "")}</div>
+                  <button key={l.id} onClick={() => pickLevel(l.id)} disabled={isLocked} className="min-h-28 text-left p-3 border transition-transform hover:scale-[1.02] disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: active ? l.ground : "rgba(0,0,0,0.22)", color: active ? "#ffffff" : isLocked ? "#6b6b6b" : "#e6e6e6", borderColor: active ? l.ground : "#3a4250" }}>
+                    <div className="flex items-center justify-between text-xs font-black"><span>{String(l.id).padStart(2, "0")}</span><span style={{ color: active ? "#ffffff" : l.ground }}>{isLocked ? "LOCK" : l.target < 9999 ? l.target : "INF"}</span></div>
+                    <div className="mt-4 text-sm font-black uppercase leading-tight">{l.name.includes("\u00b7") ? l.name.split("\u00b7").pop()!.trim() : l.name}</div>
                   </button>
                 );
               })}
             </div>
           ) : (
-            <div className="flex flex-col gap-2">
-              <button
-                onClick={openCreateEditor}
-                className="px-3 py-2 text-xs font-black tracking-wider border-2 border-dashed transition-colors hover:bg-[#22e6ff] hover:text-[#0a0a0a]"
-                style={{ borderColor: "#22e6ff", color: "#22e6ff" }}
-              >+ СОЗДАТЬ УРОВЕНЬ</button>
-              {customLevels.length === 0 && (
-                <p className="text-[10px] text-center mt-2" style={{ color: "#6b6b6b" }}>
-                  Создай свой уровень: настрой скорость, цвета, тему и цель.
-                </p>
-              )}
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <button onClick={openCreateEditor} className="min-h-28 p-3 text-sm font-black tracking-wider uppercase border-2 border-dashed transition-colors hover:bg-[#22e6ff] hover:text-[#0a0a0a]" style={{ borderColor: "#22e6ff", color: "#22e6ff" }}>+ CREATE LEVEL</button>
+              {customLevels.length === 0 && <p className="text-xs self-center" style={{ color: "#6b6b6b" }}>Create your own level: speed, colors, theme, and goal.</p>}
               {customLevels.map((l) => {
                 const active = l.id === levelId;
                 return (
-                  <div
-                    key={l.id}
-                    className="border"
-                    style={{
-                      background: active ? l.ground : "transparent",
-                      borderColor: active ? l.ground : "#3a4250",
-                    }}
-                  >
-                    <button
-                      onClick={() => pickLevel(l.id)}
-                      className="text-left w-full px-3 py-2 text-xs tracking-wider"
-                      style={{ color: active ? "#ffffff" : "#e6e6e6" }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>★ {l.name.slice(0, 14)}</span>
-                        <span style={{ color: active ? "#ffffff" : l.ground }}>{l.target}</span>
-                      </div>
-                    </button>
-                    <div className="flex gap-1 px-2 pb-2">
-                      <button
-                        onClick={() => openEditEditor(l)}
-                        className="flex-1 py-0.5 text-[10px] border"
-                        style={{ borderColor: "#facc15", color: active ? "#fff" : "#facc15" }}
-                      >ИЗМ.</button>
-                      <button
-                        onClick={() => deleteCustom(l.id)}
-                        className="flex-1 py-0.5 text-[10px] border"
-                        style={{ borderColor: "#e22718", color: active ? "#fff" : "#e22718" }}
-                      >УДАЛ.</button>
-                    </div>
+                  <div key={l.id} className="border p-3" style={{ background: active ? l.ground : "rgba(0,0,0,0.22)", borderColor: active ? l.ground : "#3a4250" }}>
+                    <button onClick={() => pickLevel(l.id)} className="text-left w-full text-sm font-black uppercase" style={{ color: active ? "#ffffff" : "#e6e6e6" }}><div className="flex items-center justify-between gap-2"><span>{l.name.slice(0, 22)}</span><span style={{ color: active ? "#ffffff" : l.ground }}>{l.target}</span></div></button>
+                    <div className="flex gap-2 mt-3"><button onClick={() => openEditEditor(l)} className="flex-1 py-1 text-[10px] border" style={{ borderColor: "#facc15", color: active ? "#fff" : "#facc15" }}>EDIT</button><button onClick={() => deleteCustom(l.id)} className="flex-1 py-1 text-[10px] border" style={{ borderColor: "#e22718", color: active ? "#fff" : "#e22718" }}>DELETE</button></div>
                   </div>
                 );
               })}
             </div>
           )}
-        </aside>
+        </section>
+      )}
 
-        {/* Canvas */}
-        <div className="relative overflow-hidden flex-shrink-0" style={{ border: `1px solid ${level.ground}` }}>
-          <canvas ref={canvasRef} className="block max-w-full h-auto" />
-          <div className="absolute top-3 left-4 font-mono text-lg" style={{ color: level.ground }}>SCORE {score}</div>
-          <div className="absolute top-3 right-4 font-mono text-lg" style={{ color: level.wall }}>BEST {best}</div>
-          {(dead || won) && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4" style={{ background: "rgba(5,1,15,0.85)" }}>
-              <div className="text-5xl font-black" style={{ color: won ? level.ground : level.wall }}>
-                {won ? "FINISH!" : "YOU FELL"}
-              </div>
-              <div className="text-xl font-mono" style={{ color: "#ffffff" }}>Score: {score}</div>
-              {won && level.id < LEVELS.length && (
-                <div className="text-xs font-mono" style={{ color: level.ground }}>Открыт уровень {level.id + 1}!</div>
-              )}
-              {!userId && (
-                <Link to="/auth" className="text-xs underline" style={{ color: "#1c69d4" }}>Войди, чтобы сохранить рекорд</Link>
-              )}
-              {userId && submitting && (
-                <div className="text-xs font-mono" style={{ color: "#1c69d4" }}>сохраняем...</div>
-              )}
-              <div className="flex gap-3">
-                <button onClick={() => restartRef.current()} className="px-6 py-3 font-bold text-sm tracking-wider uppercase transition-opacity hover:opacity-80" style={{ background: level.ground, color: "#ffffff" }}>
-                  {won ? "ПОВТОР" : "RUN AGAIN"}
-                </button>
-                {won && level.id < LEVELS.length && (
-                  <button onClick={nextLevel} className="px-6 py-3 font-bold text-sm tracking-wider uppercase transition-opacity hover:opacity-80" style={{ background: level.wall, color: "#ffffff" }}>
-                    ДАЛЬШЕ →
-                  </button>
-                )}
+      {gameView === "play" && (
+        <>
+          <section className="w-full max-w-5xl p-3 font-mono" style={{ background: "rgba(26,33,41,0.7)", border: "1px solid #22e6ff" }}>
+            <div className="flex flex-col md:flex-row md:items-center gap-3">
+              <button type="button" onClick={voiceEnabled ? stopVoiceControl : startVoiceControl} className="px-4 py-2 text-xs font-black tracking-wider uppercase border transition-colors" style={{ background: voiceEnabled ? "#22e6ff" : "transparent", borderColor: "#22e6ff", color: voiceEnabled ? "#0a0a0a" : "#22e6ff" }}>{voiceEnabled ? "VOICE ON" : "ENABLE VOICE"}</button>
+              <div className="flex-1">
+                <div className="h-3 w-full" style={{ background: "rgba(255,255,255,0.12)" }}><div className="h-full transition-all" style={{ width: String(Math.min(100, Math.round(voiceVolume * 360))) + "%", background: voiceVolume >= voiceThreshold ? "#fffb00" : "#22e6ff" }} /></div>
+                <div className="mt-1 flex justify-between gap-3 text-[10px]" style={{ color: voiceError ? "#e22718" : "#6b6b6b" }}><span>{voiceError ?? "Make a loud sound - the player jumps"}</span><span>{Math.round(voiceVolume * 100)}%</span></div>
               </div>
             </div>
-          )}
-        </div>
+          </section>
 
-        {/* Right: skins + leaderboard */}
-        <div className="w-full lg:w-64 flex flex-col gap-4">
-          <aside className="p-4 font-mono" style={{ background: "rgba(26,33,41,0.7)", border: "1px solid #facc15" }}>
-            <h2 className="text-sm font-black mb-2 tracking-wider" style={{ color: "#facc15" }}>🎁 ЕЖЕДНЕВНЫЙ ПОДАРОК</h2>
-            <p className="text-[10px] mb-2" style={{ color: "#a3a3a3" }}>
-              {canClaim ? "Забери 3 случайных скина!" : "Возвращайся завтра за новым подарком."}
-            </p>
-            <button
-              onClick={claimDaily}
-              disabled={!canClaim}
-              className="w-full py-2 font-bold text-xs tracking-wider uppercase transition-opacity disabled:opacity-40"
-              style={{ background: canClaim ? "#facc15" : "#3a4250", color: "#0a0a0a" }}
-            >
-              {canClaim ? "ЗАБРАТЬ ПОДАРОК" : "ПОЛУЧЕНО"}
-            </button>
-            <div className="mt-2 text-[10px]" style={{ color: "#6b6b6b" }}>
-              Открыто: {owned.length} / {SKINS.length}
-            </div>
+          <div className="relative overflow-hidden flex-shrink-0 max-w-5xl w-full" style={{ border: "1px solid " + level.ground }}>
+            <canvas ref={canvasRef} className="block w-full h-auto" />
+            <div className="absolute top-3 left-4 font-mono text-lg" style={{ color: level.ground }}>SCORE {score}</div>
+            <div className="absolute top-3 right-4 font-mono text-lg" style={{ color: level.wall }}>BEST {best}</div>
+            {(dead || won) && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4" style={{ background: "rgba(5,1,15,0.85)" }}>
+                <div className="text-5xl font-black" style={{ color: won ? level.ground : level.wall }}>{won ? "FINISH!" : "YOU FELL"}</div>
+                <div className="text-xl font-mono" style={{ color: "#ffffff" }}>Score: {score}</div>
+                {won && level.id < LEVELS.length && <div className="text-xs font-mono" style={{ color: level.ground }}>Level {level.id + 1} unlocked!</div>}
+                {!userId && <Link to="/auth" className="text-xs underline" style={{ color: "#1c69d4" }}>Sign in to save score</Link>}
+                {userId && submitting && <div className="text-xs font-mono" style={{ color: "#1c69d4" }}>saving...</div>}
+                <div className="flex flex-wrap justify-center gap-3"><button onClick={() => restartRef.current()} className="px-6 py-3 font-bold text-sm tracking-wider uppercase transition-opacity hover:opacity-80" style={{ background: level.ground, color: "#ffffff" }}>{won ? "RETRY" : "RUN AGAIN"}</button><button onClick={() => setGameView("levels")} className="px-6 py-3 font-bold text-sm tracking-wider uppercase border" style={{ borderColor: "#1c69d4", color: "#1c69d4" }}>LEVELS</button>{won && level.id < LEVELS.length && <button onClick={nextLevel} className="px-6 py-3 font-bold text-sm tracking-wider uppercase transition-opacity hover:opacity-80" style={{ background: level.wall, color: "#ffffff" }}>NEXT ?</button>}</div>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      {gameView === "skins" && (
+        <section className="w-full max-w-5xl grid gap-4 lg:grid-cols-[260px_1fr] font-mono">
+          <aside className="p-4" style={{ background: "rgba(26,33,41,0.76)", border: "1px solid #facc15" }}>
+            <h2 className="text-sm font-black mb-2 tracking-wider" style={{ color: "#facc15" }}>DAILY GIFT</h2>
+            <p className="text-[10px] mb-2" style={{ color: "#a3a3a3" }}>{canClaim ? "Claim 3 random skins!" : "Come back tomorrow for a new gift."}</p>
+            <button onClick={claimDaily} disabled={!canClaim} className="w-full py-2 font-bold text-xs tracking-wider uppercase transition-opacity disabled:opacity-40" style={{ background: canClaim ? "#facc15" : "#3a4250", color: "#0a0a0a" }}>{canClaim ? "CLAIM GIFT" : "CLAIMED"}</button>
+            <div className="mt-2 text-[10px]" style={{ color: "#6b6b6b" }}>Unlocked: {owned.length} / {SKINS.length}</div>
+            <div className="mt-5 border-t pt-4" style={{ borderColor: "#3a4250" }}><div className="text-[10px] font-black tracking-wider mb-2" style={{ color: "#facc15" }}>SELECTED</div><div className="w-20 h-20 flex items-center justify-center border-2" style={{ borderColor: "#facc15", background: "rgba(0,0,0,0.35)" }}><ShapeSwatch shape={skin.shape} body={skin.body} stroke={skin.stroke} /></div><div className="mt-2 text-[10px]" style={{ color: skin.body }}>{skin.name}</div></div>
           </aside>
 
-          <aside className="p-4 font-mono" style={{ background: "rgba(26,33,41,0.7)", border: "1px solid #1c69d4" }}>
-            <h2 className="text-sm font-black mb-3 tracking-wider" style={{ color: "#1c69d4" }}>СКИНЫ</h2>
-            <div className="grid grid-cols-5 gap-2 max-h-80 overflow-y-auto pr-1">
+          <div className="p-4" style={{ background: "rgba(26,33,41,0.76)", border: "1px solid #1c69d4" }}>
+            <h2 className="text-sm font-black mb-3 tracking-wider" style={{ color: "#1c69d4" }}>SKIN SELECT</h2>
+            <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 max-h-[520px] overflow-y-auto pr-1">
               {SKINS.map((s) => {
                 const isOwned = owned.includes(s.id);
                 return (
-                  <button
-                    key={s.id}
-                    onClick={() => isOwned && setSkinId(s.id)}
-                    disabled={!isOwned}
-                    title={isOwned ? s.name : "🔒 Заблокировано"}
-                    className="aspect-square flex items-center justify-center border-2 transition-transform hover:scale-105 disabled:cursor-not-allowed"
-                    style={{
-                      background: "rgba(0,0,0,0.3)",
-                      borderColor: skinId === s.id ? "#ffffff" : "#3a4250",
-                      outline: skinId === s.id ? "2px solid #1c69d4" : "none",
-                      outlineOffset: "2px",
-                      opacity: isOwned ? 1 : 0.25,
-                      filter: isOwned ? "none" : "grayscale(1)",
-                    }}
-                  >
-                    {isOwned ? (
-                      <ShapeSwatch shape={s.shape} body={s.body} stroke={s.stroke} />
-                    ) : (
-                      <span className="text-base">🔒</span>
-                    )}
+                  <button key={s.id} onClick={() => isOwned && setSkinId(s.id)} disabled={!isOwned} title={isOwned ? s.name : "Locked"} className="aspect-square flex items-center justify-center border-2 transition-transform hover:scale-105 disabled:cursor-not-allowed" style={{ background: "rgba(0,0,0,0.3)", borderColor: skinId === s.id ? "#ffffff" : "#3a4250", outline: skinId === s.id ? "2px solid #1c69d4" : "none", outlineOffset: "2px", opacity: isOwned ? 1 : 0.25, filter: isOwned ? "none" : "grayscale(1)" }}>
+                    {isOwned ? <ShapeSwatch shape={s.shape} body={s.body} stroke={s.stroke} /> : <span className="text-[10px]">LOCK</span>}
                   </button>
                 );
               })}
             </div>
-
-            <div className="mt-2 text-[10px] tracking-wider" style={{ color: "#6b6b6b" }}>ВЫБРАН: <span style={{ color: skin.body }}>{skin.name}</span></div>
-          </aside>
-
-          <aside className="p-4 font-mono" style={{ background: "rgba(26,33,41,0.7)", border: "1px solid #1c69d4" }}>
-            <h2 className="text-sm font-black mb-3 tracking-wider" style={{ color: "#1c69d4" }}>ТОП-10</h2>
-            {leaders.length === 0 ? (
-              <p className="text-xs" style={{ color: "#6b6b6b" }}>Пока пусто.</p>
-            ) : (
-              <ol className="flex flex-col gap-1.5 text-xs">
-                {leaders.map((l, i) => (
-                  <li key={i} className="flex items-center justify-between gap-2">
-                    <span style={{ color: i === 0 ? "#ffffff" : "#6b6b6b" }}>{String(i + 1).padStart(2, "0")}. {l.username}</span>
-                    <span style={{ color: "#e22718" }}>{l.best_score}</span>
-                  </li>
-                ))}
-              </ol>
-            )}
-          </aside>
-        </div>
-      </div>
+          </div>
+        </section>
+      )}
 
       {giftPopup && (
         <div
