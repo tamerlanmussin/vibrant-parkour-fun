@@ -798,7 +798,7 @@ function Game() {
     window.addEventListener("keydown", kd);
     window.addEventListener("keyup", ku);
 
-    let player = { x: 120, y: 200, w: 28, h: 40, vx: 0, vy: 0, onGround: false, onWall: 0 as -1 | 0 | 1, jumps: 2 };
+    let player = { x: 120, y: 200, w: 34, h: 34, vx: 0, vy: 0, onGround: false, onWall: 0 as -1 | 0 | 1, jumps: 2 };
     let cameraX = 0;
     let platforms: Platform[] = [];
     let lastX = 0;
@@ -833,7 +833,7 @@ function Game() {
       lastX = lastX + gap + w;
     }
     function reset() {
-      player = { x: 120, y: 200, w: 28, h: 40, vx: 0, vy: 0, onGround: false, onWall: 0, jumps: 2 };
+      player = { x: 120, y: 200, w: 34, h: 34, vx: 0, vy: 0, onGround: false, onWall: 0, jumps: 2 };
       cameraX = 0; scoreLocal = 0; alive = true; finished = false;
       setDead(false); setWon(false); setScore(0);
       seedWorld();
