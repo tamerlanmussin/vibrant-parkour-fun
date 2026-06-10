@@ -141,19 +141,6 @@ function MainMenu() {
         </div>
       </section>
 
-      <footer className="relative z-10 mt-auto flex items-end justify-between px-4 pb-5 md:px-8">
-        <div className="flex flex-wrap gap-3">
-          <button className="h-12 w-12 border-4 text-lg font-black shadow-[4px_4px_0_#000]" style={{ borderColor: "#ffffff", background: "#1c69d4", color: "#ffffff" }}>f</button>
-          <button className="h-12 w-12 border-4 text-lg font-black shadow-[4px_4px_0_#000]" style={{ borderColor: "#ffffff", background: "#23a9f2", color: "#ffffff" }}>t</button>
-          <button className="h-12 w-12 border-4 text-lg font-black shadow-[4px_4px_0_#000]" style={{ borderColor: "#ffffff", background: "#e22718", color: "#ffffff" }}>▶</button>
-        </div>
-        <div className="flex gap-4">
-          <Link to="/levels" className="flex h-16 w-16 items-center justify-center rounded-full border-4 text-2xl font-black shadow-[4px_4px_0_#000]" style={{ borderColor: "#ffffff", background: "#92e329", color: "#245a0d" }}>1</Link>
-          <button onClick={() => setSkinsOpen(true)} className="flex h-16 w-16 items-center justify-center rounded-full border-4 text-2xl font-black shadow-[4px_4px_0_#000]" style={{ borderColor: "#ffffff", background: "#92e329", color: "#245a0d" }}>□</button>
-        </div>
-        <button onClick={openCreateEditor} className="border-4 px-4 py-3 text-lg font-black uppercase leading-4 shadow-[5px_5px_0_#000]" style={{ borderColor: "#ffffff", background: "#92e329", color: "#245a0d" }}>Create<br />Level</button>
-      </footer>
-
       {skinsOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.72)" }} onClick={() => setSkinsOpen(false)}>
           <div className="w-full max-w-3xl border-4 p-5 shadow-[10px_10px_0_#000]" style={{ background: "#1a1232", borderColor: "#ffffff" }} onClick={(e) => e.stopPropagation()}>
