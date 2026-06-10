@@ -977,7 +977,11 @@ function Game() {
   const shortLevelName = level.name.includes("\u00b7") ? level.name.split("\u00b7").pop()!.trim() : level.name;
 
   return (
-    <main className="min-h-screen flex flex-col items-center gap-4 p-4 transition-colors duration-500" style={{ background: `radial-gradient(circle at 50% 0%, ${level.bgTop} 0%, ${level.bgBot} 60%, #05010f 100%)` }}>
+    <main
+      className={`min-h-screen flex flex-col items-center transition-colors duration-500 ${gameView === "play" ? "gap-0 overflow-hidden p-0" : "gap-4 p-4"}`}
+      style={{ background: `radial-gradient(circle at 50% 0%, ${level.bgTop} 0%, ${level.bgBot} 60%, #05010f 100%)` }}
+    >
+      {gameView !== "play" && (
       <nav className="w-full max-w-5xl flex items-center justify-between text-sm font-bold tracking-wider">
         <Link to="/" style={{ color: "#e6e6e6" }}>NEON PARKOUR</Link>
         <div className="flex items-center gap-3">
@@ -992,6 +996,7 @@ function Game() {
           )}
         </div>
       </nav>
+      )}
 
       {showRules && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(5,1,15,0.85)" }} onClick={() => setShowRules(false)}>
@@ -1011,13 +1016,15 @@ function Game() {
         </div>
       )}
 
+      {gameView !== "play" && (
       <header className="text-center">
         <h1 className="text-4xl md:text-5xl font-black tracking-tighter" style={{ color: "#ffffff" }}>NEON PARKOUR</h1>
         <p className="text-sm md:text-base mt-1" style={{ color: "#6b6b6b" }}>{level.name} - GOAL: {level.target < 9999 ? level.target : "INF"}</p>
       </header>
+      )}
 
       {gameView !== "menu" && (
-        <div className="w-full max-w-5xl flex flex-wrap items-center justify-center gap-2 font-mono">
+        <div className={`font-mono ${gameView === "play" ? "fixed left-3 top-3 z-20 flex flex-wrap items-center gap-2" : "w-full max-w-5xl flex flex-wrap items-center justify-center gap-2"}`}>
           <button onClick={() => setGameView("menu")} className="px-4 py-2 text-xs font-black tracking-wider uppercase border" style={{ borderColor: "#6b6b6b", color: "#e6e6e6" }}>MENU</button>
           <button onClick={() => setGameView("levels")} className="px-4 py-2 text-xs font-black tracking-wider uppercase border" style={{ borderColor: "#1c69d4", color: gameView === "levels" ? "#ffffff" : "#1c69d4", background: gameView === "levels" ? "#1c69d4" : "transparent" }}>LEVELS</button>
           <button onClick={() => setGameView("skins")} className="px-4 py-2 text-xs font-black tracking-wider uppercase border" style={{ borderColor: "#facc15", color: gameView === "skins" ? "#0a0a0a" : "#facc15", background: gameView === "skins" ? "#facc15" : "transparent" }}>SKINS</button>
@@ -1120,7 +1127,7 @@ function Game() {
 
       {gameView === "play" && (
         <>
-          <section className="w-full max-w-5xl p-3 font-mono" style={{ background: "rgba(26,33,41,0.7)", border: "1px solid #22e6ff" }}>
+          <section className="fixed left-3 right-3 bottom-3 z-20 p-3 font-mono md:left-auto md:w-[520px]" style={{ background: "rgba(26,33,41,0.72)", border: "1px solid #22e6ff" }}>
             <div className="flex flex-col md:flex-row md:items-center gap-3">
               <button type="button" onClick={voiceEnabled ? stopVoiceControl : startVoiceControl} className="px-4 py-2 text-xs font-black tracking-wider uppercase border transition-colors" style={{ background: voiceEnabled ? "#22e6ff" : "transparent", borderColor: "#22e6ff", color: voiceEnabled ? "#0a0a0a" : "#22e6ff" }}>{voiceEnabled ? "VOICE ON" : "ENABLE VOICE"}</button>
               <div className="flex-1">
@@ -1130,10 +1137,10 @@ function Game() {
             </div>
           </section>
 
-          <div className="relative overflow-hidden flex-shrink-0 max-w-5xl w-full" style={{ border: "1px solid " + level.ground }}>
-            <canvas ref={canvasRef} className="block w-full h-auto" />
-            <div className="absolute top-3 left-4 font-mono text-lg" style={{ color: level.ground }}>SCORE {score}</div>
-            <div className="absolute top-3 right-4 font-mono text-lg" style={{ color: level.wall }}>BEST {best}</div>
+          <div className="relative h-screen w-screen overflow-hidden flex-shrink-0" style={{ border: "none" }}>
+            <canvas ref={canvasRef} className="block h-full w-full" />
+            <div className="absolute left-4 top-16 z-10 font-mono text-lg md:top-4" style={{ color: level.ground }}>SCORE {score}</div>
+            <div className="absolute right-4 top-16 z-10 font-mono text-lg md:top-4" style={{ color: level.wall }}>BEST {best}</div>
             {(dead || won) && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4" style={{ background: "rgba(5,1,15,0.85)" }}>
                 <div className="text-5xl font-black" style={{ color: won ? level.ground : level.wall }}>{won ? "FINISH!" : "YOU FELL"}</div>
