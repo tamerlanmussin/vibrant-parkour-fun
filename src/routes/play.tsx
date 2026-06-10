@@ -520,7 +520,7 @@ function Game() {
   const [leaders, setLeaders] = useState<LeaderRow[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [showRules, setShowRules] = useState(false);
-  const [gameView, setGameView] = useState<"menu" | "levels" | "skins" | "play">("menu");
+  const [gameView, setGameView] = useState<"menu" | "levels" | "skins" | "play">("play");
 
   const DEFAULT_OWNED = useMemo(
     () => SKINS.filter((s) => s.shape === "square" && ["БЕЛЫЙ", "СИНИЙ", "КРАСНЫЙ"].some((n) => s.name.endsWith(n))).map((s) => s.id),
@@ -1024,8 +1024,8 @@ function Game() {
 
       {gameView !== "menu" && (
         <div className={`font-mono ${gameView === "play" ? "fixed left-3 top-3 z-20 flex flex-wrap items-center gap-2" : "w-full max-w-5xl flex flex-wrap items-center justify-center gap-2"}`}>
-          <button onClick={() => setGameView("menu")} className="px-4 py-2 text-xs font-black tracking-wider uppercase border" style={{ borderColor: "#6b6b6b", color: "#e6e6e6" }}>MENU</button>
-          <button onClick={() => setGameView("levels")} className="px-4 py-2 text-xs font-black tracking-wider uppercase border" style={{ borderColor: "#1c69d4", color: gameView === "levels" ? "#ffffff" : "#1c69d4", background: gameView === "levels" ? "#1c69d4" : "transparent" }}>LEVELS</button>
+          <Link to="/" className="px-4 py-2 text-xs font-black tracking-wider uppercase border" style={{ borderColor: "#6b6b6b", color: "#e6e6e6" }}>MENU</Link>
+          <Link to="/levels" className="px-4 py-2 text-xs font-black tracking-wider uppercase border" style={{ borderColor: "#1c69d4", color: "#1c69d4" }}>LEVELS</Link>
           <button onClick={() => setGameView("play")} className="px-5 py-2 text-xs font-black tracking-wider uppercase" style={{ background: level.ground, color: "#ffffff" }}>PLAY</button>
         </div>
       )}
@@ -1156,7 +1156,7 @@ function Game() {
                 {won && level.id < LEVELS.length && <div className="text-xs font-mono" style={{ color: level.ground }}>Level {level.id + 1} unlocked!</div>}
                 {!userId && <Link to="/auth" className="text-xs underline" style={{ color: "#1c69d4" }}>Sign in to save score</Link>}
                 {userId && submitting && <div className="text-xs font-mono" style={{ color: "#1c69d4" }}>saving...</div>}
-                <div className="flex flex-wrap justify-center gap-3"><button onClick={() => restartRef.current()} className="px-6 py-3 font-bold text-sm tracking-wider uppercase transition-opacity hover:opacity-80" style={{ background: level.ground, color: "#ffffff" }}>{won ? "RETRY" : "RUN AGAIN"}</button><button onClick={() => setGameView("levels")} className="px-6 py-3 font-bold text-sm tracking-wider uppercase border" style={{ borderColor: "#1c69d4", color: "#1c69d4" }}>LEVELS</button>{won && level.id < LEVELS.length && <button onClick={nextLevel} className="px-6 py-3 font-bold text-sm tracking-wider uppercase transition-opacity hover:opacity-80" style={{ background: level.wall, color: "#ffffff" }}>NEXT ?</button>}</div>
+                <div className="flex flex-wrap justify-center gap-3"><button onClick={() => restartRef.current()} className="px-6 py-3 font-bold text-sm tracking-wider uppercase transition-opacity hover:opacity-80" style={{ background: level.ground, color: "#ffffff" }}>{won ? "RETRY" : "RUN AGAIN"}</button><Link to="/levels" className="px-6 py-3 font-bold text-sm tracking-wider uppercase border" style={{ borderColor: "#1c69d4", color: "#1c69d4" }}>LEVELS</Link>{won && level.id < LEVELS.length && <button onClick={nextLevel} className="px-6 py-3 font-bold text-sm tracking-wider uppercase transition-opacity hover:opacity-80" style={{ background: level.wall, color: "#ffffff" }}>NEXT ?</button>}</div>
               </div>
             )}
           </div>
