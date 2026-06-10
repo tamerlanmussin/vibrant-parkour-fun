@@ -30,7 +30,7 @@ function SkinPreview({ skin }: { skin: Skin }) {
 
 function MainMenu() {
   const defaultOwned = useMemo(
-    () => SKINS.filter((s) => s.shape === "square" && ["БЕЛЫЙ", "СИНИЙ", "КРАСНЫЙ"].some((n) => s.name.endsWith(n))).map((s) => s.id),
+    () => SKINS.filter((s) => s.shape === "square").slice(0, 3).map((s) => s.id),
     []
   );
   const [skinId, setSkinId] = useState(() => {
@@ -53,6 +53,7 @@ function MainMenu() {
     } catch {}
     return [];
   });
+  const [skinsOpen, setSkinsOpen] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
   const [draft, setDraft] = useState<Level | null>(null);
 
@@ -106,87 +107,100 @@ function MainMenu() {
   }
 
   return (
-    <main className="min-h-screen p-4 md:p-6" style={{ background: "radial-gradient(circle at 50% 0%, #1a2129 0%, #262e38 48%, #05010f 100%)" }}>
-      <nav className="mx-auto mb-5 flex w-full max-w-7xl items-center justify-between text-sm font-bold tracking-wider">
-        <span style={{ color: "#e6e6e6" }}>NEON PARKOUR</span>
-        <Link to="/auth" className="px-3 py-1 text-xs uppercase border" style={{ borderColor: "#1c69d4", color: "#1c69d4" }}>LOGIN</Link>
+    <main className="relative min-h-screen overflow-hidden font-mono" style={{ background: "linear-gradient(180deg, #b407a9 0%, #d315c8 43%, #6c087a 44%, #1a1232 100%)" }}>
+      <div className="absolute inset-0 opacity-30" style={{ background: "radial-gradient(circle at 12% 18%, #ff62d7 0 8%, transparent 9%), radial-gradient(circle at 78% 20%, #ff62d7 0 10%, transparent 11%), radial-gradient(circle at 52% 46%, #ff62d7 0 18%, transparent 19%)" }} />
+      <div className="absolute bottom-0 left-0 right-0 h-[25vh]" style={{ background: "repeating-linear-gradient(90deg, #360c4a 0 86px, #190923 86px 96px), linear-gradient(#ea18cf, #340a43)", borderTop: "8px solid #ff58e8" }} />
+      <div className="absolute left-[-6vw] top-[42vh] h-2 w-[122vw] rotate-[-38deg] bg-white shadow-[0_0_0_4px_#b8c3d1,0_0_18px_#ffffff]" />
+      <div className="absolute left-[56vw] top-[43vh] h-2 w-[44vw] rotate-[42deg] bg-white shadow-[0_0_0_4px_#b8c3d1,0_0_18px_#ffffff]" />
+
+      <nav className="relative z-10 flex items-center justify-between px-4 py-4 md:px-8">
+        <Link to="/auth" className="border-4 px-4 py-2 text-xs font-black uppercase shadow-[4px_4px_0_#000]" style={{ borderColor: "#ffffff", background: "#1c69d4", color: "#ffffff" }}>LOGIN</Link>
+        <div className="flex gap-3">
+          <button className="h-12 w-12 border-4 text-xl font-black shadow-[4px_4px_0_#000]" style={{ borderColor: "#ffffff", background: "#92e329", color: "#22570c" }}>?</button>
+          <button className="h-12 w-12 border-4 text-xl font-black shadow-[4px_4px_0_#000]" style={{ borderColor: "#ffffff", background: "#92e329", color: "#22570c" }}>i</button>
+        </div>
       </nav>
 
-      <section className="mx-auto grid w-full max-w-7xl gap-4 lg:grid-cols-[280px_1fr_300px]">
-        <aside className="p-4 font-mono" style={{ background: "rgba(26,33,41,0.78)", border: "1px solid #facc15" }}>
-          <h2 className="mb-3 text-sm font-black tracking-wider" style={{ color: "#facc15" }}>SKINS</h2>
-          <div className="mb-3 flex items-center gap-3 border p-3" style={{ borderColor: "#3a4250", background: "rgba(0,0,0,0.25)" }}>
-            <div className="h-16 w-16"><SkinPreview skin={skin} /></div>
-            <div className="min-w-0 text-[10px]" style={{ color: skin.body }}>{skin.name}</div>
-          </div>
-          <div className="grid max-h-[520px] grid-cols-4 gap-2 overflow-y-auto pr-1">
-            {SKINS.map((s) => {
-              const isOwned = owned.includes(s.id);
-              return (
-                <button
-                  key={s.id}
-                  onClick={() => isOwned && setSkinId(s.id)}
-                  disabled={!isOwned}
-                  title={isOwned ? s.name : "Locked"}
-                  className="aspect-square border-2 p-1 transition-transform hover:scale-105 disabled:cursor-not-allowed"
-                  style={{
-                    background: "rgba(0,0,0,0.3)",
-                    borderColor: skinId === s.id ? "#ffffff" : "#3a4250",
-                    opacity: isOwned ? 1 : 0.25,
-                    filter: isOwned ? "none" : "grayscale(1)",
-                  }}
-                >
-                  {isOwned ? <SkinPreview skin={s} /> : <span className="text-[9px]" style={{ color: "#6b6b6b" }}>LOCK</span>}
-                </button>
-              );
-            })}
-          </div>
-        </aside>
+      <section className="relative z-10 mx-auto flex min-h-[68vh] max-w-6xl flex-col items-center justify-center px-4 text-center">
+        <h1 className="mb-8 text-5xl font-black uppercase leading-none md:text-8xl" style={{ color: "#a8ff36", WebkitTextStroke: "2px #ffffff", textShadow: "0 7px 0 #1b4b13, 0 12px 0 #000000" }}>
+          NEON PARKOUR
+        </h1>
 
-        <section className="flex min-h-[520px] flex-col items-center justify-center p-6 text-center font-mono" style={{ background: "rgba(26,33,41,0.78)", border: "2px solid #1c69d4" }}>
-          <h1 className="text-5xl font-black tracking-tighter md:text-7xl" style={{ color: "#ffffff" }}>NEON<br /><span style={{ color: "#1c69d4" }}>PARKOUR</span></h1>
-          <div className="my-8 flex items-end gap-2">
-            <div className="h-12 w-4" style={{ background: "#1c69d4" }} />
-            <div className="h-8 w-4" style={{ background: "#e22718" }} />
-            <div className="h-8 w-8"><SkinPreview skin={skin} /></div>
-            <div className="h-16 w-4" style={{ background: "#22e6ff" }} />
-            <div className="h-10 w-4" style={{ background: "#facc15" }} />
-          </div>
-          <Link to="/levels" className="px-12 py-5 text-base font-black uppercase tracking-wider transition-transform hover:scale-[1.03]" style={{ background: "#1c69d4", color: "#ffffff" }}>PLAY</Link>
-          <p className="mt-4 text-xs" style={{ color: "#6b6b6b" }}>Select a level on /levels to start the run.</p>
-        </section>
+        <div className="grid w-full max-w-4xl grid-cols-3 items-center gap-4 md:gap-10">
+          <button onClick={() => setSkinsOpen(true)} className="mx-auto flex h-24 w-24 items-center justify-center border-4 shadow-[7px_7px_0_#000] transition-transform hover:scale-105 md:h-36 md:w-36" style={{ borderColor: "#ffffff", background: "#92e329" }} aria-label="Open skins">
+            <div className="h-14 w-14 md:h-20 md:w-20"><SkinPreview skin={skin} /></div>
+          </button>
 
-        <aside className="p-4 font-mono" style={{ background: "rgba(26,33,41,0.78)", border: "1px solid #22e6ff" }}>
-          <h2 className="mb-3 text-sm font-black tracking-wider" style={{ color: "#22e6ff" }}>CREATE</h2>
-          <button onClick={openCreateEditor} className="mb-3 min-h-24 w-full border-2 border-dashed p-3 text-sm font-black uppercase tracking-wider hover:bg-[#22e6ff] hover:text-[#0a0a0a]" style={{ borderColor: "#22e6ff", color: "#22e6ff" }}>+ CREATE LEVEL</button>
-          <div className="flex max-h-[520px] flex-col gap-3 overflow-y-auto pr-1">
-            {customLevels.length === 0 && <p className="text-xs" style={{ color: "#6b6b6b" }}>Your created levels will be here.</p>}
-            {customLevels.map((level) => (
-              <div key={level.id} className="border p-3" style={{ borderColor: "#3a4250", background: "rgba(0,0,0,0.22)" }}>
-                <button onClick={() => chooseCustom(level.id)} className="w-full text-left text-xs font-black uppercase" style={{ color: "#e6e6e6" }}>
-                  <span>{level.name.slice(0, 22)}</span>
-                  <span className="float-right" style={{ color: level.ground }}>{level.target}</span>
-                </button>
-                <div className="mt-3 flex gap-2">
-                  <button onClick={() => { setDraft({ ...level }); setEditorOpen(true); }} className="flex-1 border py-1 text-[10px]" style={{ borderColor: "#facc15", color: "#facc15" }}>EDIT</button>
-                  <button onClick={() => deleteCustom(level.id)} className="flex-1 border py-1 text-[10px]" style={{ borderColor: "#e22718", color: "#e22718" }}>DELETE</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </aside>
+          <Link to="/levels" className="mx-auto flex h-32 w-32 items-center justify-center border-4 shadow-[9px_9px_0_#000] transition-transform hover:scale-105 md:h-48 md:w-48" style={{ borderColor: "#ffffff", background: "#92e329" }} aria-label="Play">
+            <span className="ml-2 block h-0 w-0 border-y-[34px] border-l-[55px] border-y-transparent md:border-y-[48px] md:border-l-[78px]" style={{ borderLeftColor: "#ffe735", filter: "drop-shadow(5px 5px 0 #1b4b13)" }} />
+          </Link>
+
+          <button onClick={openCreateEditor} className="mx-auto flex h-24 w-24 items-center justify-center border-4 text-5xl font-black shadow-[7px_7px_0_#000] transition-transform hover:scale-105 md:h-36 md:w-36 md:text-7xl" style={{ borderColor: "#ffffff", background: "#92e329", color: "#245a0d", textShadow: "3px 3px 0 #d6ff50" }} aria-label="Create level">
+            X
+          </button>
+        </div>
       </section>
 
-      {editorOpen && draft && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.85)" }} onClick={() => setEditorOpen(false)}>
-          <div className="max-h-[90vh] w-full max-w-xl overflow-y-auto p-6 font-mono" style={{ background: "#1a2129", border: "2px solid #22e6ff" }} onClick={(e) => e.stopPropagation()}>
+      <footer className="relative z-10 mt-auto flex items-end justify-between px-4 pb-5 md:px-8">
+        <div className="flex flex-wrap gap-3">
+          <button className="h-12 w-12 border-4 text-lg font-black shadow-[4px_4px_0_#000]" style={{ borderColor: "#ffffff", background: "#1c69d4", color: "#ffffff" }}>f</button>
+          <button className="h-12 w-12 border-4 text-lg font-black shadow-[4px_4px_0_#000]" style={{ borderColor: "#ffffff", background: "#23a9f2", color: "#ffffff" }}>t</button>
+          <button className="h-12 w-12 border-4 text-lg font-black shadow-[4px_4px_0_#000]" style={{ borderColor: "#ffffff", background: "#e22718", color: "#ffffff" }}>▶</button>
+        </div>
+        <div className="flex gap-4">
+          <Link to="/levels" className="flex h-16 w-16 items-center justify-center rounded-full border-4 text-2xl font-black shadow-[4px_4px_0_#000]" style={{ borderColor: "#ffffff", background: "#92e329", color: "#245a0d" }}>1</Link>
+          <button onClick={() => setSkinsOpen(true)} className="flex h-16 w-16 items-center justify-center rounded-full border-4 text-2xl font-black shadow-[4px_4px_0_#000]" style={{ borderColor: "#ffffff", background: "#92e329", color: "#245a0d" }}>□</button>
+        </div>
+        <button onClick={openCreateEditor} className="border-4 px-4 py-3 text-lg font-black uppercase leading-4 shadow-[5px_5px_0_#000]" style={{ borderColor: "#ffffff", background: "#92e329", color: "#245a0d" }}>Create<br />Level</button>
+      </footer>
+
+      {skinsOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.72)" }} onClick={() => setSkinsOpen(false)}>
+          <div className="w-full max-w-3xl border-4 p-5 shadow-[10px_10px_0_#000]" style={{ background: "#1a1232", borderColor: "#ffffff" }} onClick={(e) => e.stopPropagation()}>
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-black" style={{ color: "#22e6ff" }}>LEVEL CREATOR</h2>
-              <button onClick={() => setEditorOpen(false)} className="px-2 text-xl" style={{ color: "#6b6b6b" }}>x</button>
+              <h2 className="text-2xl font-black uppercase" style={{ color: "#a8ff36", WebkitTextStroke: "1px #ffffff", textShadow: "0 4px 0 #000" }}>Skins</h2>
+              <button onClick={() => setSkinsOpen(false)} className="h-10 w-10 border-2 text-xl font-black" style={{ borderColor: "#ffffff", color: "#ffffff" }}>x</button>
             </div>
-            <div className="flex flex-col gap-3 text-xs" style={{ color: "#e6e6e6" }}>
+            <div className="mb-4 flex items-center gap-4 border-2 p-3" style={{ borderColor: "#ff58e8", background: "rgba(0,0,0,0.24)" }}>
+              <div className="h-20 w-20"><SkinPreview skin={skin} /></div>
+              <div className="text-sm font-black uppercase" style={{ color: skin.body }}>{skin.name}</div>
+            </div>
+            <div className="grid max-h-[58vh] grid-cols-5 gap-3 overflow-y-auto pr-1 md:grid-cols-8">
+              {SKINS.map((s) => {
+                const isOwned = owned.includes(s.id);
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => isOwned && setSkinId(s.id)}
+                    disabled={!isOwned}
+                    title={isOwned ? s.name : "Locked"}
+                    className="aspect-square border-4 p-2 transition-transform hover:scale-105 disabled:cursor-not-allowed"
+                    style={{
+                      background: skinId === s.id ? "#92e329" : "rgba(255,255,255,0.12)",
+                      borderColor: skinId === s.id ? "#ffffff" : "#4f2d64",
+                      opacity: isOwned ? 1 : 0.25,
+                      filter: isOwned ? "none" : "grayscale(1)",
+                    }}
+                  >
+                    {isOwned ? <SkinPreview skin={s} /> : <span className="text-[9px]" style={{ color: "#ffffff" }}>LOCK</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editorOpen && draft && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.78)" }} onClick={() => setEditorOpen(false)}>
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto border-4 p-5 font-mono shadow-[10px_10px_0_#000]" style={{ background: "#1a1232", borderColor: "#ffffff" }} onClick={(e) => e.stopPropagation()}>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-2xl font-black uppercase" style={{ color: "#a8ff36", WebkitTextStroke: "1px #ffffff", textShadow: "0 4px 0 #000" }}>Create Level</h2>
+              <button onClick={() => setEditorOpen(false)} className="h-10 w-10 border-2 text-xl font-black" style={{ borderColor: "#ffffff", color: "#ffffff" }}>x</button>
+            </div>
+            <div className="flex flex-col gap-3 text-xs" style={{ color: "#ffffff" }}>
               <label className="flex flex-col gap-1">
-                <span style={{ color: "#22e6ff" }}>NAME</span>
+                <span style={{ color: "#a8ff36" }}>NAME</span>
                 <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} className="border bg-black/40 px-2 py-1" style={{ borderColor: "#3a4250", color: "#fff" }} />
               </label>
               <div className="grid grid-cols-2 gap-3">
@@ -199,7 +213,21 @@ function MainMenu() {
                 {THEMES.map((theme) => <option key={theme} value={theme}>{theme}</option>)}
               </select>
             </div>
-            <button onClick={saveDraft} className="mt-5 w-full py-3 text-xs font-black uppercase tracking-wider" style={{ background: "#22e6ff", color: "#0a0a0a" }}>SAVE LEVEL</button>
+            <button onClick={saveDraft} className="mt-5 w-full border-4 py-3 text-xs font-black uppercase tracking-wider shadow-[5px_5px_0_#000]" style={{ borderColor: "#ffffff", background: "#92e329", color: "#245a0d" }}>SAVE LEVEL</button>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {customLevels.map((level) => (
+                <div key={level.id} className="border-2 p-3" style={{ borderColor: "#4f2d64", background: "rgba(0,0,0,0.2)" }}>
+                  <button onClick={() => chooseCustom(level.id)} className="w-full text-left text-xs font-black uppercase" style={{ color: "#ffffff" }}>
+                    <span>{level.name.slice(0, 22)}</span>
+                    <span className="float-right" style={{ color: level.ground }}>{level.target}</span>
+                  </button>
+                  <div className="mt-3 flex gap-2">
+                    <button onClick={() => { setDraft({ ...level }); setEditorOpen(true); }} className="flex-1 border py-1 text-[10px]" style={{ borderColor: "#facc15", color: "#facc15" }}>EDIT</button>
+                    <button onClick={() => deleteCustom(level.id)} className="flex-1 border py-1 text-[10px]" style={{ borderColor: "#e22718", color: "#e22718" }}>DELETE</button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
