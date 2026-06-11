@@ -510,6 +510,7 @@ function drawBackdrop(ctx: CanvasRenderingContext2D, theme: Theme, cam: number, 
 
 function Game() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const touchInputRef = useRef({ left: false, right: false, jump: false });
   const [score, setScore] = useState(0);
   const [best, setBest] = useState(0);
   const [dead, setDead] = useState(false);
@@ -777,6 +778,10 @@ function Game() {
     voiceCleanupRef.current = () => {};
   }
 
+  function setTouchControl(control: "left" | "right" | "jump", active: boolean) {
+    touchInputRef.current[control] = active;
+  }
+
   useEffect(() => stopVoiceControl, []);
 
   useEffect(() => {
@@ -848,13 +853,15 @@ function Game() {
       const L = levelRef.current;
       const accel = 0.9;
       const max = L.speed;
-      if (keys["ArrowLeft"] || keys["KeyA"]) player.vx = Math.max(player.vx - accel, -max);
-      else if (keys["ArrowRight"] || keys["KeyD"]) player.vx = Math.min(player.vx + accel, max);
+      const touchInput = touchInputRef.current;
+      if (keys["ArrowLeft"] || keys["KeyA"] || touchInput.left) player.vx = Math.max(player.vx - accel, -max);
+      else if (keys["ArrowRight"] || keys["KeyD"] || touchInput.right) player.vx = Math.min(player.vx + accel, max);
       else player.vx = player.onGround ? 0 : player.vx * 0.9;
 
       const voiceJump = voiceEnabled && voiceVolumeRef.current >= voiceThreshold;
       const keyboardJump = !voiceEnabled && (keys["Space"] || keys["ArrowUp"] || keys["KeyW"]);
-      const jumpPressed = keyboardJump || voiceJump;
+      const touchJump = !voiceEnabled && touchInput.jump;
+      const jumpPressed = keyboardJump || touchJump || voiceJump;
       if (jumpPressed && !jumpHeld) {
         if (player.onWall !== 0) { player.vy = -wallJumpPower; player.vx = -player.onWall * 6.2; player.jumps = 1; }
         else if (player.jumps > 0) { player.vy = -jumpPower; player.jumps--; }
@@ -1135,7 +1142,7 @@ function Game() {
 
       {gameView === "play" && (
         <>
-          <section className="fixed left-3 right-3 bottom-3 z-20 p-3 font-mono md:left-auto md:w-[520px]" style={{ background: "rgba(26,33,41,0.72)", border: "1px solid #22e6ff" }}>
+          <section className="fixed left-3 right-3 bottom-28 z-20 p-3 font-mono md:left-auto md:bottom-3 md:w-[520px]" style={{ background: "rgba(26,33,41,0.72)", border: "1px solid #22e6ff" }}>
             <div className="flex flex-col md:flex-row md:items-center gap-3">
               <button type="button" onClick={voiceEnabled ? stopVoiceControl : startVoiceControl} className="px-4 py-2 text-xs font-black tracking-wider uppercase border transition-colors" style={{ background: voiceEnabled ? "#22e6ff" : "transparent", borderColor: "#22e6ff", color: voiceEnabled ? "#0a0a0a" : "#22e6ff" }}>{voiceEnabled ? "VOICE ON" : "ENABLE VOICE"}</button>
               <div className="flex-1">
@@ -1149,6 +1156,47 @@ function Game() {
             <canvas ref={canvasRef} className="block h-full w-full" />
             <div className="absolute left-4 top-20 z-10 px-3 py-2 font-mono text-lg font-black" style={{ color: level.ground, background: "rgba(5, 1, 15, 0.58)" }}>SCORE {score}</div>
             <div className="absolute right-4 top-20 z-10 px-3 py-2 font-mono text-lg font-black" style={{ color: level.wall, background: "rgba(5, 1, 15, 0.58)" }}>BEST {best}</div>
+            <div className="absolute inset-x-3 bottom-4 z-30 flex items-end justify-between gap-3 select-none md:hidden" style={{ touchAction: "none" }}>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  aria-label="Move left"
+                  onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); setTouchControl("left", true); }}
+                  onPointerUp={() => setTouchControl("left", false)}
+                  onPointerCancel={() => setTouchControl("left", false)}
+                  onPointerLeave={() => setTouchControl("left", false)}
+                  className="flex h-20 w-20 items-center justify-center border-4 text-4xl font-black active:scale-95"
+                  style={{ borderColor: "#ffffff", background: "rgba(28,105,212,0.78)", color: "#ffffff", boxShadow: "5px 5px 0 #000" }}
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  aria-label="Move right"
+                  onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); setTouchControl("right", true); }}
+                  onPointerUp={() => setTouchControl("right", false)}
+                  onPointerCancel={() => setTouchControl("right", false)}
+                  onPointerLeave={() => setTouchControl("right", false)}
+                  className="flex h-20 w-20 items-center justify-center border-4 text-4xl font-black active:scale-95"
+                  style={{ borderColor: "#ffffff", background: "rgba(28,105,212,0.78)", color: "#ffffff", boxShadow: "5px 5px 0 #000" }}
+                >
+                  ›
+                </button>
+              </div>
+              <button
+                type="button"
+                aria-label="Jump"
+                onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); setTouchControl("jump", true); }}
+                onPointerUp={() => setTouchControl("jump", false)}
+                onPointerCancel={() => setTouchControl("jump", false)}
+                onPointerLeave={() => setTouchControl("jump", false)}
+                disabled={voiceEnabled}
+                className="flex h-24 w-24 items-center justify-center border-4 text-sm font-black uppercase tracking-wider active:scale-95 disabled:opacity-40"
+                style={{ borderColor: "#ffffff", background: "rgba(34,230,255,0.82)", color: "#06121a", boxShadow: "5px 5px 0 #000" }}
+              >
+                Jump
+              </button>
+            </div>
             {(dead || won) && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4" style={{ background: "rgba(5,1,15,0.85)" }}>
                 <div className="text-5xl font-black" style={{ color: won ? level.ground : level.wall }}>{won ? "FINISH!" : "YOU FELL"}</div>
