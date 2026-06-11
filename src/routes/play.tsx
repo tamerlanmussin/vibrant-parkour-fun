@@ -1147,8 +1147,8 @@ function Game() {
 
           <div className="relative h-screen w-screen overflow-hidden flex-shrink-0" style={{ border: "none" }}>
             <canvas ref={canvasRef} className="block h-full w-full" />
-            <div className="absolute left-4 top-16 z-10 font-mono text-lg md:top-4" style={{ color: level.ground }}>SCORE {score}</div>
-            <div className="absolute right-4 top-16 z-10 font-mono text-lg md:top-4" style={{ color: level.wall }}>BEST {best}</div>
+            <div className="absolute left-4 top-20 z-10 px-3 py-2 font-mono text-lg font-black" style={{ color: level.ground, background: "rgba(5, 1, 15, 0.58)" }}>SCORE {score}</div>
+            <div className="absolute right-4 top-20 z-10 px-3 py-2 font-mono text-lg font-black" style={{ color: level.wall, background: "rgba(5, 1, 15, 0.58)" }}>BEST {best}</div>
             {(dead || won) && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4" style={{ background: "rgba(5,1,15,0.85)" }}>
                 <div className="text-5xl font-black" style={{ color: won ? level.ground : level.wall }}>{won ? "FINISH!" : "YOU FELL"}</div>
